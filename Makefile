@@ -4,6 +4,12 @@ run-backend:
 	@echo "Running backend"
 	@cd backend && go run main.go serve
 
+# Target: run-frontend
+# Description: Runs the frontend application.
+run-frontend:
+	@echo "Running frontend"
+	@cd frontend && npm run dev
+
 # Target: build-backend
 # Description: Builds the backend application.
 build-backend:
