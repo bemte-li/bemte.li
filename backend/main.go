@@ -7,6 +7,8 @@ import (
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
+
+	_ "bemteli/migrations"
 )
 
 func main() {
