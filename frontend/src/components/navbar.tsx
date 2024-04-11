@@ -2,18 +2,10 @@ import Link from 'next/link';
 
 const Navbar: React.FC = () => {
     return (
-        <nav>
-            <ul>
-                <li>
+        <nav className="flex items-center justify-between flex-wrap bg-gray-500 p-6">
                     <Link href="/">Navbar</Link>
-                </li>
-                <li>
                     <Link href="/">a ser</Link>
-                </li>
-                <li>
                     <Link href="/">definida</Link>
-                </li>
-            </ul>
         </nav>
     );
 };
