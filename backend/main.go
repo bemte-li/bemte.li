@@ -14,6 +14,9 @@ import (
 func main() {
 	app := pocketbase.New()
 
+	// TODO: Load  SMTP settings from a file or environment variables
+	// See https://github.com/pocketbase/pocketbase/discussions/1551
+
 	// loosely check if it was executed using "go run"
 	isGoRun := strings.HasPrefix(os.Args[0], os.TempDir())
 
