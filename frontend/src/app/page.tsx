@@ -3,7 +3,7 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "#FFFCEC" }}>
       <Image
-      src="/logo-svg-27.svg"
+      src="./logo-svg-27.svg"
       alt="Bemte.li"
       width={500}
       height={500}
