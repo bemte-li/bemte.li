@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Highlight } from "@/components/Highlight";
 
 export default function Home() {
   return (
@@ -25,7 +26,7 @@ export default function Home() {
         <div className="container mx-auto px-8 md:px-16">
           <h2 className="text-3xl font-bold mb-4">Saia do substack!</h2>
           <p className="text-lg max-w-2xl"> 
-            Precisamos acreditar que mandar um simples email não pode depender dos negócios do Vale do Silício nem do dinheiro do petróleo.
+            Precisamos acreditar que mandar um simples e-mail não pode depender dos negócios do Vale do Silício nem do dinheiro do petróleo.
           </p>
         </div>
       </section>
@@ -43,9 +44,9 @@ export default function Home() {
       {/* Light Section */}
       <section className="w-full py-16 bg-marfim">
         <div className="container mx-auto px-8 md:px-16">
-        <h2 className="text-3xl font-bold mb-4">O Bemte.li envia emails e arquiva o conteúdo deles num endereço na internet.</h2> 
+          <h2 className="text-3xl font-bold mb-4">O Bemte.li envia e-mails e arquiva o conteúdo deles num endereço na internet.</h2> 
           <p className="text-lg max-w-2xl">
-            Isso acontece gratuitamente, sem anúncios, com arrecadação coletiva, sem mediação das bigueteques.
+            Isso acontece <Highlight>gratuitamente</Highlight>, sem anúncios, com arrecadação coletiva, sem mediação das bigueteques.
           </p>
         </div>
       </section>
