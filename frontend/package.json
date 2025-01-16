@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy-gh": "gh-pages -d out -t true --nojekyll",
+    "deploy-gh": "gh-pages -d out --nojekyll --dotfiles",
     "deploy": "npm run build && npm run deploy-gh"
   },
   "dependencies": {
