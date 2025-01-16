@@ -2,4 +2,7 @@
     "tailwindCSS.experimental.classRegex": [
         "class:\\s*?[\"'`]([^\"'`]*).*?,"
       ],
+      "eslint.workingDirectories": [
+        "frontend"
+      ],
 }

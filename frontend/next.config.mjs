@@ -5,7 +5,6 @@ const nextConfig = {
   images: {
     unoptimized: true, // Disable default image optimization
   },
-  assetPrefix: '.',
   output: 'export'
 };
 

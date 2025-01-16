@@ -1,7 +1,22 @@
 import type { Metadata } from "next";
+import { Cousine } from "next/font/google";
 
 // These styles apply to every route in the application
 import './globals.css'
+
+const cousine = Cousine({ 
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  display: 'swap',
+  variable: '--font-cousine',
+});
+
+// const panelMono = localFont({
+//   src: '../fonts/PanelMonoItalic.woff2',
+//   display: 'swap',
+//   style: 'italic',
+//   variable: '--font-panel-mono',
+// });
 
 export const metadata: Metadata = {
   title: "Bemte.li",
@@ -14,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body>{children}</body>
+    <html lang="pt-BR" className={`${cousine.variable}`}>
+      <body className="font-regular bg-marfim text-sombra">{children}</body>
     </html>
   );
 }
