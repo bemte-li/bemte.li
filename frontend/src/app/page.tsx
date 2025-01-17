@@ -8,7 +8,7 @@ export default function Home() {
       <section className="w-full min-h-screen bg-marfim flex items-center justify-center">
         <div className="container mx-auto px-8 md:px-16 flex flex-col md:flex-row items-center justify-between">
           <Image
-            src="/logo-svg-27.svg"
+            src="/Logo-Vertical.svg"
             alt="Bemte.li"
             width={400}
             height={400}

@@ -1,17 +1,23 @@
 import Link from 'next/link'
+import Image from "next/image";
+
 
 export default function Footer() {
   return (
     <footer className="w-full bg-gradient-to-b from-marfim to-citrino py-8 mt-auto">
-      <div className="max-w-4xl mx-auto px-4 text-center">
-        {/* Placeholder for birds art */}
-        <div className="mb-6">
-          {/* We'll replace this with SVG later */}
-          <div className="h-8 w-24 mx-auto bg-sombra/80" />
+      <div className="w-full text-center">
+        <div className="mb-6 overflow-hidden">
+          <Image
+            src="/Fio-Rodape.svg"
+            alt="Decorative footer art"
+            width={3939}
+            height={208}
+            className="w-full scale-100 mt-2"
+          />
         </div>
         
         {/* Navigation links */}
-        <nav className="mb-6">
+        <nav className="mb-6 px-4">
           <ul className="flex justify-center gap-4 text-sombra">
             <li>
               <Link href="/sobre" className="hover:text-sombra/70">
@@ -34,7 +40,7 @@ export default function Footer() {
         </nav>
 
         {/* Contact line */}
-        <p className="text-sombra">
+        <p className="text-sombra px-4">
           Mande um e-mail para{' '}
           <a 
             href="mailto:contato@bemte.li" 

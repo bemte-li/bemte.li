@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Highlight } from './Highlight';
+import Image from 'next/image';
 
 interface NavbarProps {
   isLoggedIn?: boolean;
@@ -11,8 +12,23 @@ export function Navbar({ isLoggedIn = false, pageName }: NavbarProps) {
     <div className="border-b border-sombra">
       <nav className="flex justify-between items-center px-6 py-4 bg-creme">
         <div className="flex items-center gap-4">
-          {/* Logo placeholder - will be replaced later */}
-          <div className="w-8 h-8 bg-bordo rounded-full"></div>
+            {pageName ? (
+                <Image
+                    src="/So-Passaros.svg"
+                    alt="Bemte.li"
+                    width={300}
+                    height={100}
+                    className="w-8 sm:w-12"
+                />
+            ) : (
+                <Image
+                    src="/Logo-Horizontal.svg"
+                    alt="Bemte.li"
+                    width={300}
+                    height={100}
+                    className="w-24 sm:w-32"
+                />
+            )}
         </div>
 
         {pageName && (

@@ -22,6 +22,18 @@ const cousine = Cousine({
 export const metadata: Metadata = {
   title: "Bemte.li",
   description: "Em construção...",
+  icons: {
+    icon: [
+      {
+        url: '/So-Passaros.svg',
+        type: 'image/svg+xml',
+      },
+      {
+        url: '/favicon.ico',
+        sizes: 'any',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
