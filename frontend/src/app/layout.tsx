@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cousine } from "next/font/google";
+import Footer from '@/components/Footer'
 
 // These styles apply to every route in the application
 import './globals.css'
@@ -30,7 +31,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${cousine.variable}`}>
-      <body className="font-regular bg-marfim text-sombra">{children}</body>
+      <body className="font-regular bg-marfim text-sombra flex flex-col min-h-screen">
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }
