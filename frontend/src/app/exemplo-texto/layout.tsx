@@ -7,7 +7,7 @@ export default function ExemploTextoLayout({
 }) {
   return (
     <div>
-      <Navbar pageName="Exemplo Texto" isLoggedIn={false} />
+      <Navbar pageName="Desculpa Incomodar" isLoggedIn={false} />
       <div className="max-w-3xl mx-auto px-4 py-8">
         {children}
       </div>
