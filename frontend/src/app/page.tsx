@@ -46,7 +46,7 @@ export default function Home() {
         <div className="container mx-auto px-8 md:px-16">
           <h2 className="text-3xl font-bold mb-4">O Bemte.li envia e-mails e arquiva o conteúdo deles num endereço na internet.</h2> 
           <p className="text-lg max-w-2xl">
-            Isso acontece <Highlight>gratuitamente</Highlight>, sem anúncios, com arrecadação coletiva, sem mediação das bigueteques.
+            Isso acontece <Highlight color="citrino">gratuitamente</Highlight>, sem anúncios, com arrecadação coletiva, sem mediação das bigueteques.
           </p>
         </div>
       </section>
