@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+[contenteditable=true]:empty:before {
+  content: attr(data-placeholder);
+  color: #666;
+  font-style: italic;
+}

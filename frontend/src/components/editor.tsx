@@ -1,17 +1,21 @@
 'use client'
 
-import { useEditor, EditorContent, useCurrentEditor, EditorProvider, Editor } from '@tiptap/react'
+import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import ListItem from '@tiptap/extension-list-item'
 import TextAlign from '@tiptap/extension-text-align'
+import { useEffect } from 'react'
 
-const MenuBar = ({editor} : {editor: Editor | null}) => {
+interface MenuBarProps {
+  editor: any
+}
+
+const MenuBar = ({ editor }: MenuBarProps) => {
   if (!editor) {
     return null
   }
 
-  const basicClasses = "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4"
-  const activeClasses = "bg-gray-400 text-gray-800 font-bold py-2 px-4"
+  const basicClasses = "bg-marfim border border-sombra/20 hover:border-sombra text-sombra font-bold py-2 px-4 transition-colors"
+  const activeClasses = "bg-citrino border border-sombra text-sombra font-bold py-2 px-4"
 
   const isActive = (command: string, attrs: any = null) => {
     if (attrs) {
@@ -21,66 +25,65 @@ const MenuBar = ({editor} : {editor: Editor | null}) => {
   }
 
   return (
-    <div className='w-full flex justify-center'>
-        <button
+    <div className='w-full flex justify-start gap-2 mb-4 flex-wrap'>
+      <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         className={isActive('heading', { level: 1 })}
       >
-        h1
+        H1
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         className={isActive('heading', { level: 2 })}
       >
-        h2
-      </button>
-      <button
-        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        className={isActive('heading', { level: 3 })}
-      >
-        h3
+        H2
       </button>
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         className={isActive('bold')}
       >
-        N
+        Negrito
       </button>
       <button
         onClick={() => editor.chain().focus().toggleItalic().run()}
         className={isActive('italic')}
       >
-        I
+        Itálico
       </button>
       <button
         onClick={() => editor.chain().focus().toggleStrike().run()}
         className={isActive('strike')}
       >
-        S
+        Riscado
       </button>
       <button 
         onClick={() => editor.chain().focus().setTextAlign('left').run()} 
         className={isActive('textAlign', { textAlign: 'left' })}
       >
-        esq
+        ←
       </button>
       <button 
         onClick={() => editor.chain().focus().setTextAlign('center').run()} 
         className={isActive('textAlign', { textAlign: 'center' })}
-        >
-        centro
+      >
+        ↔
       </button>
       <button 
         onClick={() => editor.chain().focus().setTextAlign('right').run()} 
         className={isActive('textAlign', { textAlign: 'right' })}
       >
-        dir
+        →
       </button>
     </div>
   )
 }
 
-export default function TextEditor() {
+interface TextEditorProps {
+  onUpdate?: (html: string) => void
+  initialContent?: string
+}
+
+export default function TextEditor({ onUpdate, initialContent = '' }: TextEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -88,21 +91,29 @@ export default function TextEditor() {
         types: ['heading', 'paragraph'],
       }),
     ],
+    content: initialContent,
     editorProps: {
       attributes: {
-        spellcheck: 'false',
-        class: 'max-w-full h-96',
+        class: 'prose prose-lg focus:outline-none min-h-[500px]',
       },
     },
+    onUpdate: ({ editor }) => {
+      onUpdate?.(editor.getHTML())
+    },
+    immediatelyRender: false
   })
 
+  // Update content when initialContent changes
+  useEffect(() => {
+    if (editor && initialContent !== editor.getHTML()) {
+      editor.commands.setContent(initialContent)
+    }
+  }, [editor, initialContent])
+
   return (
-    <div>
+    <div className="border border-sombra/20 rounded-lg p-4">
       <MenuBar editor={editor} />
-      <EditorContent 
-        editor={editor} 
-        className='max-w-full h-96'
-      />
+      <EditorContent editor={editor} />
     </div>
   )
 }
