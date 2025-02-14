@@ -65,6 +65,14 @@ Note: Since we're using self-signed certificates for local development, your bro
   - No manual container restart needed for most changes
   - Database migrations are automatically applied in development mode
 
+### Development Superuser
+
+In development mode, a default superuser account is automatically created with the following credentials:
+- Email: dev@bemte.li
+- Password: dev1234567
+
+You can use these credentials to access the admin interface and manage your development environment.
+
 ### Troubleshooting
 
 1. Certificate Issues

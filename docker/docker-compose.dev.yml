@@ -44,6 +44,8 @@ services:
       - ../backend/pb_data:/app/tmp/pb_data
       - ../backend/migrations:/app/tmp/migrations
       - ../backend:/app
+    env_file:
+      - .env.development
     environment:
       - APP_ENV=development
     networks:

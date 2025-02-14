@@ -43,6 +43,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend/pb_data:/pb_data
+    env_file:
+      - .env.production
     networks:
       - web
     healthcheck:
