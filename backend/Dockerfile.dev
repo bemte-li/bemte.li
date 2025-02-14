@@ -1,0 +1,25 @@
+# Development Dockerfile for Pocketbase backend
+FROM golang:1.23-alpine
+
+WORKDIR /app
+
+# Install development dependencies
+RUN apk add --no-cache git
+
+# Install air for hot reloading
+RUN go install github.com/air-verse/air@latest
+
+# Copy go mod files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy the rest of the application
+COPY . .
+COPY .air.toml .
+
+EXPOSE 8090
+
+# Use air for hot reloading
+CMD ["air", "-c", ".air.toml"] 

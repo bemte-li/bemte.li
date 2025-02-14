@@ -1,5 +1,5 @@
 # Pocketbase backend build
-FROM golang:1.21 as build
+FROM golang:1.23 AS build
 WORKDIR /go/src/bemteli
 # RUN go get -d -v golang.org/x/net/html
 COPY . .

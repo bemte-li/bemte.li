@@ -19,3 +19,38 @@
 
 # Pocketbase
 pb_data/
+
+# Environment files
+.env
+.env.local
+.env.*
+!.env.example
+
+# SSL certificates
+docker/nginx/ssl/
+
+# Development data
+docker/backend/pb_data/
+docker/stalwart/
+tmp/
+
+# Node.js
+node_modules/
+.next/
+build/
+dist/
+
+# IDE and OS files
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker volumes
+docker/**/*_data/
