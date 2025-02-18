@@ -1,6 +1,7 @@
-package main
+package config
 
 import (
+	"bemteli/internal/hooks"
 	"fmt"
 	"log"
 	"os"
@@ -39,7 +40,18 @@ func InitApp() *pocketbase.PocketBase {
 		log.Fatal(err)
 	}
 
+	// Register hooks from the hooks package
+	if err := registerHooksFromPackage(app); err != nil {
+		log.Fatal(err)
+	}
+
 	return app
+}
+
+// registerHooksFromPackage registers all hooks from the hooks package
+func registerHooksFromPackage(app *pocketbase.PocketBase) error {
+	hooks.RegisterConviteHooks(app)
+	return nil
 }
 
 // initDevSuperUser creates a default superuser in development mode

@@ -3,20 +3,33 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { createConvite } from "@/lib/pocketbase";
 import Footer from "@/components/Footer";
 
 export default function SolicitarConvite() {
   const [formData, setFormData] = useState({
-    name: "",
+    nome: "",
     email: "",
-    message: "",
+    sobre: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement form submission logic
-    setIsSubmitted(true);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await createConvite(formData);
+      setIsSubmitted(true);
+    } catch (err) {
+      setError('Ocorreu um erro ao enviar sua solicitação. Por favor, tente novamente.');
+      console.error('Error submitting form:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -52,7 +65,7 @@ export default function SolicitarConvite() {
             </div>
 
             <h1 className="text-2xl mb-4 text-sombra font-bold">
-              Recebemos a sua solicitação, {formData.name}!
+              Recebemos a sua solicitação, {formData.nome}!
             </h1>
             
             <p className="text-lg text-sombra">
@@ -79,11 +92,12 @@ export default function SolicitarConvite() {
                 <label className="text-sombra whitespace-nowrap">Nome:</label>
                 <input
                   type="text"
-                  id="name"
-                  value={formData.name}
+                  id="nome"
+                  value={formData.nome}
                   onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
+                    setFormData({ ...formData, nome: e.target.value })
                   }
+                  required
                   className="w-full border-b border-sombra bg-transparent pb-1 focus:outline-none focus:border-sombra transition-colors text-sombra"
                 />
               </div>
@@ -98,6 +112,7 @@ export default function SolicitarConvite() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
+                  required
                   className="w-full border-b border-sombra bg-transparent pb-1 focus:outline-none focus:border-sombra transition-colors text-sombra"
                 />
               </div>
@@ -106,24 +121,32 @@ export default function SolicitarConvite() {
             {/* Message Textarea */}
             <div className="relative">
               <textarea
-                id="message"
-                value={formData.message}
+                id="sobre"
+                value={formData.sobre}
                 onChange={(e) =>
-                  setFormData({ ...formData, message: e.target.value })
+                  setFormData({ ...formData, sobre: e.target.value })
                 }
                 rows={8}
+                required
                 placeholder="Conte sobre você e seu interesse em participar do Bemte.li"
                 className="w-full border border-sombra bg-transparent p-4 focus:outline-none focus:border-sombra transition-colors resize-none text-sombra placeholder:text-sombra/60"
               />
             </div>
 
+            {error && (
+              <div className="text-red-500 text-center">
+                {error}
+              </div>
+            )}
+
             {/* Submit Button */}
             <div className="flex justify-center">
               <button
                 type="submit"
-                className="bg-citrino px-6 py-2 text-sm hover:bg-citrino/90 transition-colors text-sombra"
+                disabled={isLoading}
+                className="bg-citrino px-6 py-2 text-sm hover:bg-citrino/90 transition-colors text-sombra disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Solicitar convite
+                {isLoading ? 'Enviando...' : 'Solicitar convite'}
               </button>
             </div>
           </form>

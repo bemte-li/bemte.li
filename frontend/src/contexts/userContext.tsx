@@ -1,103 +1,120 @@
 "use client";
 
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import PocketBase from 'pocketbase';
+import { getClientSideInstance } from "@/lib/pocketbase";
+import type { RecordModel } from "pocketbase";
 
+interface User extends RecordModel {
+  email: string;
+  name?: string;
+  // Add other user fields as needed
+}
 
-export const UserContext = createContext({});
+interface UserContextType {
+  user: User | null;
+  loading: boolean;
+  error: Error | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => void;
+  createAccount: (userData: Partial<User> & { password: string }) => Promise<User>;
+}
 
-export const useUserContext = () => {
-    return useContext(UserContext);
+const UserContext = createContext<UserContextType>({} as UserContextType);
+
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser must be used within a UserContextProvider");
+  }
+  return context;
 };
 
-type Props = {
-    children: ReactNode;
-};
+export function UserContextProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-export const UserContextProvider = ({ children }: Props) => {
-    const [user, setUser] = useState<any | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [componentLoading, setComponentLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [reload, setReload] = useState(false);
-    const client = new PocketBase("http://127.0.0.1:8090");
+  useEffect(() => {
+    const pb = getClientSideInstance();
 
-    useEffect(() => {
-        async function checkAuth() {
-            await client.collection("usuarios").authRefresh()
-                .then((newAuthData) => {
-                    setUser(newAuthData.record.id);
-                })
-                .catch((error) => {
-                    throw error;
-                })
+    // Try to refresh auth on mount
+    const refreshAuth = async () => {
+      try {
+        if (pb.authStore.isValid) {
+          await pb.collection("usuarios").authRefresh();
+          setUser(pb.authStore.model as User);
         }
-        checkAuth()
-            .catch((error) => {
-                logout(true)
-                console.log(error);
-            })
-            .finally(() => {
-                setLoading(false);
-                setReload(!reload);
-            })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const signInWithEmail = async (username: string, password: string) => {
-        setLoading(true);
-
-        await client.collection("usuarios").authWithPassword(username, password).then((newAuthData) => {
-            setUser(newAuthData.record.id);
-        }).catch((error) => {
-            setError(error);
-            console.log(error);
-        }
-        ).finally(() => {
-            setLoading(false);
-        });
-    }
-
-    const logout = (noalert: boolean | null) => {
-        client.authStore.clear();
+      } catch (err) {
+        console.error("Auth refresh failed:", err);
+        pb.authStore.clear();
         setUser(null);
-        if (!noalert || noalert === null) {
-            alert("Sessão encerrada com sucesso");
-        }
-    }
-
-    const createAccount = async (userData: any) => {
-        setLoading(true);
-
-        await client.collection("usuarios").create(userData).then((newAuthData) => {
-            setUser(newAuthData.record.id);
-        }).catch((error) => {
-            setError(error);
-            console.log(error);
-        }
-        ).finally(() => {
-            setLoading(false);
-        });
-    }
-
-    const contextValue = {
-        user,
-        loading,
-        componentLoading,
-        error,
-        reload,
-        client,
-        setLoading,
-        setComponentLoading,
-        setReload,
-        signInWithEmail,
-        createAccount,
-        logout
+      } finally {
+        setLoading(false);
+      }
     };
 
-    return (
-        <UserContext.Provider value={contextValue}>
-            {children}
-        </UserContext.Provider>
-    )
+    // Listen for auth state changes
+    pb.authStore.onChange((token, model) => {
+      setUser(model ? (model as User) : null);
+    });
+
+    refreshAuth();
+
+    // No need to cleanup onChange as it's handled by PocketBase internally
+  }, []);
+
+  const signIn = async (email: string, password: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const pb = getClientSideInstance();
+      const authData = await pb.collection("usuarios").authWithPassword(email, password);
+      setUser(authData.record as User);
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signOut = () => {
+    const pb = getClientSideInstance();
+    pb.authStore.clear();
+    setUser(null);
+  };
+
+  const createAccount = async (userData: Partial<User> & { password: string }): Promise<User> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const pb = getClientSideInstance();
+      const record = await pb.collection("usuarios").create(userData);
+      // Automatically sign in after account creation
+      await signIn(userData.email!, userData.password);
+      return record as User;
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <UserContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        signIn,
+        signOut,
+        createAccount,
+      }}
+    >
+      {children}
+    </UserContext.Provider>
+  );
 }

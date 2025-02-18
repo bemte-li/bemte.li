@@ -2,10 +2,14 @@ package main
 
 import (
 	"log"
+
+	"bemteli/internal/config"
+
+	_ "bemteli/migrations"
 )
 
 func main() {
-	app := InitApp()
+	app := config.InitApp()
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
