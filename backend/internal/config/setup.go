@@ -88,11 +88,24 @@ func initSMTP(app core.App) error {
 			return err
 		}
 
+		// Configure SMTP
+		e.App.Settings().Meta.SenderName = "Bemte.li"
+		e.App.Settings().Meta.SenderAddress = "nao-responda@bemte.li"
 		e.App.Settings().SMTP.Enabled = cast.ToBool(os.Getenv("SMTP_ENABLED"))
 		e.App.Settings().SMTP.Host = os.Getenv("SMTP_HOST")
 		e.App.Settings().SMTP.Port = cast.ToInt(os.Getenv("SMTP_PORT"))
 		e.App.Settings().SMTP.Username = os.Getenv("SMTP_USERNAME")
 		e.App.Settings().SMTP.Password = os.Getenv("SMTP_PASSWORD")
+
+		// Configure rate limiting
+		e.App.Settings().RateLimits.Enabled = true
+		e.App.Settings().RateLimits.Rules = []core.RateLimitRule{
+			// 2 requests per minute for creating convites
+			{Label: "convites:create", Duration: 60, MaxRequests: 2},
+		}
+
+		// Configure User IP, to be used for rate limiting, because we're using a reverse proxy
+		e.App.Settings().TrustedProxy.Headers = []string{"X-Real-IP"}
 
 		return nil
 	})
