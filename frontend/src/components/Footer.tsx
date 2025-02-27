@@ -16,7 +16,7 @@ export default function Footer() {
           />
         </div>
         
-        {/* Navigation links */}
+        {/* Navigation links
         <nav className="mb-6 px-4">
           <ul className="flex justify-center gap-4 text-sombra">
             <li>
@@ -37,7 +37,7 @@ export default function Footer() {
               </Link>
             </li>
           </ul>
-        </nav>
+        </nav> */}
 
         {/* Contact line */}
         <p className="text-sombra px-4">

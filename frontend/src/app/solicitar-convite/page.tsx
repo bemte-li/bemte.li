@@ -48,12 +48,18 @@ export default function SolicitarConvite() {
       </div>
 
       <div className="relative w-full max-w-xl">
-        <div
-          className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-            isSubmitted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
-          }`}
-        >
-          <div className="text-center">
+        <div className="text-left mb-12 max-w-xl mx-auto">
+          <p className="text-sombra mb-4">
+            O ritmo do Bemte.li é humano. São três cabeças e seis mãos trabalhando há dois anos nesse projeto que ainda está em desenvolvimento.
+          </p>
+          <p className="text-sombra mb-4">
+            Assim, para darmos conta de tudo, você precisa solicitar um convite para fazer parte e, num futuro breve, publicar e enviar sua niusleter por aqui. Manteremos suas informações no nosso banco de dados e entraremos em contato quando o Bemte.li estiver pronto para operar.
+          </p>
+        </div>
+
+        {/* Success message */}
+        {isSubmitted ? (
+          <div className="text-center transition-all duration-500 ease-in-out">
             <div className="w-32 mx-auto mb-12">
               <Image
                 src="/Passaro-Convite.svg"
@@ -72,85 +78,80 @@ export default function SolicitarConvite() {
               Em breve entraremos em contato no e-mail<br />
               {formData.email}.
             </p>
+            <p className="text-lg text-sombra">
+              Estamos contentes em encontrar pessoas pra sonhar com a gente. Até breve!
+            </p>
           </div>
-        </div>
+        ) : (
+          <div className="transition-all duration-500 ease-in-out">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Name and Email Inputs Container */}
+              <div className="flex flex-col md:flex-row gap-8 mb-8">
+                {/* Name Input */}
+                <div className="flex-1 flex items-center gap-2">
+                  <label className="text-sombra whitespace-nowrap">Nome:</label>
+                  <input
+                    type="text"
+                    id="nome"
+                    value={formData.nome}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nome: e.target.value })
+                    }
+                    required
+                    className="w-full border-b border-sombra bg-transparent pb-1 focus:outline-none focus:border-sombra transition-colors text-sombra"
+                  />
+                </div>
 
-        <div
-          className={`transition-all duration-500 ease-in-out ${
-            isSubmitted ? "opacity-0 -translate-y-4 pointer-events-none" : "opacity-100 translate-y-0"
-          }`}
-        >
-          <h1 className="text-center mb-12 text-lg text-sombra">
-            Explicação breve sobre porque precisa de convite.
-          </h1>
+                {/* Email Input */}
+                <div className="flex-1 flex items-center gap-2">
+                  <label className="text-sombra whitespace-nowrap">E-mail:</label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    required
+                    className="w-full border-b border-sombra bg-transparent pb-1 focus:outline-none focus:border-sombra transition-colors text-sombra"
+                  />
+                </div>
+              </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Name and Email Inputs Container */}
-            <div className="flex flex-col md:flex-row gap-8 mb-8">
-              {/* Name Input */}
-              <div className="flex-1 flex items-center gap-2">
-                <label className="text-sombra whitespace-nowrap">Nome:</label>
-                <input
-                  type="text"
-                  id="nome"
-                  value={formData.nome}
+              {/* Message Textarea */}
+              <div className="relative">
+                <textarea
+                  id="sobre"
+                  value={formData.sobre}
                   onChange={(e) =>
-                    setFormData({ ...formData, nome: e.target.value })
+                    setFormData({ ...formData, sobre: e.target.value })
                   }
+                  rows={8}
                   required
-                  className="w-full border-b border-sombra bg-transparent pb-1 focus:outline-none focus:border-sombra transition-colors text-sombra"
+                  placeholder="Conte sobre você e seu interesse em participar do Bemte.li"
+                  className="w-full border border-sombra bg-transparent p-4 focus:outline-none focus:border-sombra transition-colors resize-none text-sombra placeholder:text-sombra/60"
                 />
               </div>
 
-              {/* Email Input */}
-              <div className="flex-1 flex items-center gap-2">
-                <label className="text-sombra whitespace-nowrap">E-mail:</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  required
-                  className="w-full border-b border-sombra bg-transparent pb-1 focus:outline-none focus:border-sombra transition-colors text-sombra"
-                />
+              {error && (
+                <div className="text-red-500 text-center">
+                  {error}
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <div className="flex justify-center">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-citrino px-6 py-2 text-sm hover:bg-citrino/90 transition-colors text-sombra disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Enviando...' : 'Solicitar convite'}
+                </button>
               </div>
-            </div>
-
-            {/* Message Textarea */}
-            <div className="relative">
-              <textarea
-                id="sobre"
-                value={formData.sobre}
-                onChange={(e) =>
-                  setFormData({ ...formData, sobre: e.target.value })
-                }
-                rows={8}
-                required
-                placeholder="Conte sobre você e seu interesse em participar do Bemte.li"
-                className="w-full border border-sombra bg-transparent p-4 focus:outline-none focus:border-sombra transition-colors resize-none text-sombra placeholder:text-sombra/60"
-              />
-            </div>
-
-            {error && (
-              <div className="text-red-500 text-center">
-                {error}
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <div className="flex justify-center">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="bg-citrino px-6 py-2 text-sm hover:bg-citrino/90 transition-colors text-sombra disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Enviando...' : 'Solicitar convite'}
-              </button>
-            </div>
-          </form>
-        </div>
+            </form>
+          </div>
+        )}
       </div>
     </main>
   );
