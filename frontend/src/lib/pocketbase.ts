@@ -1,5 +1,12 @@
 import PocketBase from 'pocketbase';
 
+// Get the PocketBase URL from environment variable or use fallback
+const getPocketBaseUrl = () => {
+  const url = process.env.NEXT_PUBLIC_POCKETBASE_URL || 'http://127.0.0.1:8090';
+  
+  return url;
+};
+
 // For client-side operations
 let clientSideInstance: PocketBase | null = null;
 
@@ -9,7 +16,8 @@ export const getClientSideInstance = () => {
   }
   
   if (!clientSideInstance) {
-    clientSideInstance = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL || 'http://127.0.0.1:8090');
+    const url = getPocketBaseUrl();
+    clientSideInstance = new PocketBase(url);
   }
   
   return clientSideInstance;
@@ -17,7 +25,7 @@ export const getClientSideInstance = () => {
 
 // For server-side operations (in Server Components or API routes)
 export const getServerSideInstance = () => {
-  return new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL || 'http://127.0.0.1:8090');
+  return new PocketBase(getPocketBaseUrl());
 };
 
 // Type for convite data based on the collection schema
