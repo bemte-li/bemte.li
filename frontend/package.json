@@ -7,9 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "deploy-gh": "gh-pages -d out --nojekyll --dotfiles",
-    "deploy": "npm run build && npm run deploy-gh"
+    "lint": "next lint"
   },
   "dependencies": {
     "@tiptap/extension-text-align": "^2.4.0",
@@ -29,7 +27,6 @@
     "autoprefixer": "^10.4.19",
     "eslint": "^8",
     "eslint-config-next": "^14.2.23",
-    "gh-pages": "^6.2.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.5.2"
