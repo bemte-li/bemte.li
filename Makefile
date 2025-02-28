@@ -1,26 +1,8 @@
-# Target: run-backend
-# Description: Runs the backend application.
-run-backend:
-	@echo "Running backend"
-	@cd backend && go run main.go serve
-
-# Target: run-frontend
-# Description: Runs the frontend application.
-run-frontend:
-	@echo "Running frontend"
-	@cd frontend && npm run dev
-
-# Target: build-backend
-# Description: Builds the backend application.
-build-backend:
-	@echo "Building backend"
-	@cd backend && CGO_ENABLED=0 go build
-
 # Target: squash-migrations
 # Description: Squashes the migrations. See https://pocketbase.io/docs/go-migrations/#migrations-history
 squash-migrations:
 	@echo "Squashing migrations"
-	@cd backend && go run main.go migrate history-sync
+	@cd backend && APP_ENV=development go run . migrate history-sync
 
 .PHONY: setup dev down restart logs clean help test lint run-backend run-frontend build-backend squash-migrations
 
@@ -39,8 +21,8 @@ else
 endif
 
 # Docker compose files
-DC_DEV = docker-compose -f docker/docker-compose.dev.yml
-DC_PROD = docker-compose -f docker/docker-compose.prod.yml
+DC_DEV = docker compose -p bemteli-dev -f docker/docker-compose.dev.yml
+DC_PROD = docker compose -p bemteli-prod -f docker/docker-compose.prod.yml
 
 help: ## Show this help message
 	@echo '$(BOLD)Usage:$(RESET)'
@@ -55,6 +37,8 @@ setup: ## Initial development setup
 
 dev: ## Start development environment
 	@echo "$(BOLD)Starting development environment...$(RESET)"
+	@${DC_DEV} down --remove-orphans
+	@${DC_DEV} build --no-cache pocketbase
 	@${DC_DEV} up -d
 	@echo "$(GREEN)Development environment is running!$(RESET)"
 	@echo "Frontend: $(BLUE)https://localhost$(RESET)"
@@ -63,7 +47,7 @@ dev: ## Start development environment
 
 down: ## Stop development environment
 	@echo "$(BOLD)Stopping development environment...$(RESET)"
-	@${DC_DEV} down
+	@${DC_DEV} down --remove-orphans
 
 restart: ## Restart development environment
 	@echo "$(BOLD)Restarting development environment...$(RESET)"
@@ -83,7 +67,7 @@ mail-logs: ## Show mail server logs
 
 clean: ## Clean up development environment (removes volumes, certificates)
 	@echo "$(BOLD)Cleaning up development environment...$(RESET)"
-	@${DC_DEV} down -v
+	@${DC_DEV} down -v --remove-orphans
 	@echo "$(BOLD)Removing directories (requires sudo)...$(RESET)"
 	@sudo rm -rf docker/nginx/ssl
 	@sudo rm -rf docker/backend/pb_data

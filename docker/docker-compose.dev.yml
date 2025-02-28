@@ -9,8 +9,6 @@ services:
       - "465:465"  # SMTPS
       - "587:587"  # SMTP Submission
       - "993:993"  # IMAPS
-    environment:
-      - MAIL_SERVICE=smtp4dev
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/default.dev.conf:/etc/nginx/conf.d/default.conf
