@@ -26,7 +26,7 @@ export default function Home() {
 
       <section className="w-full">
         <div className="container mx-auto px-8 md:px-16">
-          <div className="max-w-2xl mx-auto space-y-6 text-base font-mono text-justify">
+          <div className="max-w-2xl mx-auto space-y-6 text-base font-mono">
             <p>
               O Bemte.li não é uma plataforma, nem um aplicativo. Não tem anúncios, não tem empresários, não tem visão de lucro. Não é uma rede social algoritmizada e algoritmizável. Não é o desejo de ser um grande negócio.
             </p>
