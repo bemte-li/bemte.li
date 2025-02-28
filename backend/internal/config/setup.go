@@ -90,7 +90,7 @@ func initSMTP(app core.App) error {
 
 		// Configure SMTP
 		e.App.Settings().Meta.SenderName = "Bemte.li"
-		e.App.Settings().Meta.SenderAddress = "nao-responda@bemte.li"
+		e.App.Settings().Meta.SenderAddress = "contato@bemte.li"
 		e.App.Settings().SMTP.Enabled = cast.ToBool(os.Getenv("SMTP_ENABLED"))
 		e.App.Settings().SMTP.Host = os.Getenv("SMTP_HOST")
 		e.App.Settings().SMTP.Port = cast.ToInt(os.Getenv("SMTP_PORT"))
