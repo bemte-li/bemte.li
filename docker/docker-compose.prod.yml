@@ -25,6 +25,9 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_POCKETBASE_URL=https://api.bemte.li
     networks:
       - web
 
