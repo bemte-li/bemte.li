@@ -27,7 +27,6 @@ func RegisterConviteHooks(app *pocketbase.PocketBase) {
 			HTML: fmt.Sprintf(`
 				<p>Olá %s,</p>
 				<p>Recebemos sua solicitação de convite para o Bemte.li!</p>
-				<p>Estamos analisando seu pedido e entraremos em contato em breve.</p>
 				<p>Obrigado pelo interesse!</p>
 				<p>Atenciosamente,<br>Equipe Bemte.li</p>
 			`, e.Record.GetString("nome")),
