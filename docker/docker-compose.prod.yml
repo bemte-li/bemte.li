@@ -39,7 +39,7 @@ services:
       context: ../backend
       dockerfile: Dockerfile
     volumes:
-      - ./backend/pb_data:/pb_data
+      - ../backend/pb_data:/app/pb_data
     env_file:
       - .env.production
     networks:
