@@ -50,10 +50,10 @@ export default function SolicitarConvite() {
       <div className="relative w-full max-w-xl">
         <div className="text-left mb-12 max-w-xl mx-auto">
           <p className="text-sombra mb-4">
-            O Bemte.li ainda não nasceu, está nascendo. Nosso ritmo é humano: são três cabeças e seis mãos trabalhando há dois anos nesse projeto que ainda está em desenvolvimento.
+            O Bemte.li ainda não nasceu, está nascendo. Nosso ritmo é humano: são três cabeças e seis mãos trabalhando há dois anos neste projeto ainda em desenvolvimento.
           </p>
           <p className="text-sombra mb-4">
-            Ao preencher seus dados, você passa a receber, com certa periodicidade, nossa niusleter Diário de borda, onde compartilhamos como estamos desenvolvendo, de maneira independente, um canto da Internet. Quanto o Bemte.li estiver operando, você poderá publicar e enviar sua niusleter por aqui ou acompanhar os textos de outros autores.
+            Ao preencher seus dados, você passa a receber, com certa periodicidade, nossa niusleter <i>Diário de borda</i>, onde compartilhamos como estamos desenvolvendo, de maneira independente, um canto da Internet. Quando o Bemte.li estiver operando, você poderá publicar e enviar sua niusleter por aqui e/ou acompanhar os textos de outros autores.
           </p>
         </div>
 
