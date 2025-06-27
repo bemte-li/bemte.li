@@ -14,14 +14,10 @@ export default function Home() {
           height={300}
           className="mb-8"
         />
-        <div className="text-center mb-8">
+        <div className="text-center mb-16">
           <h1 className="text-2xl font-mono mb-2">Uma alternativa de niusleter</h1>
           <p className="text-lg font-mono">100% brasileira, gratuita e<br />de código aberto.</p>
         </div>
-        
-        <Link href="/solicitar-convite" className="bg-citrino hover:bg-citrino/90 text-sombra font-bold py-3 px-6 w-64 text-center mb-16">
-          SOLICITE UM CONVITE
-        </Link>
       </section>
 
       <section className="w-full">
@@ -59,7 +55,7 @@ export default function Home() {
             
             <div className="mt-10 mb-16 flex justify-center">
               <Link href="/solicitar-convite" className="bg-citrino hover:bg-citrino/90 text-sombra font-bold py-3 px-6 w-64 text-center">
-                SOLICITE UM CONVITE
+                Faça parte
               </Link>
             </div>
           </div>

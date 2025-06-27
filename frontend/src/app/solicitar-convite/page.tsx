@@ -50,10 +50,10 @@ export default function SolicitarConvite() {
       <div className="relative w-full max-w-xl">
         <div className="text-left mb-12 max-w-xl mx-auto">
           <p className="text-sombra mb-4">
-            O ritmo do Bemte.li é humano. São três cabeças e seis mãos trabalhando há dois anos nesse projeto que ainda está em desenvolvimento.
+            O Bemte.li ainda não nasceu, está nascendo. Nosso ritmo é humano: são três cabeças e seis mãos trabalhando há dois anos nesse projeto que ainda está em desenvolvimento.
           </p>
           <p className="text-sombra mb-4">
-            Assim, para darmos conta de tudo, você precisa solicitar um convite para fazer parte e, num futuro breve, publicar e enviar sua niusleter por aqui. Manteremos suas informações no nosso banco de dados e entraremos em contato quando o Bemte.li estiver pronto para operar.
+            Ao preencher seus dados, você passa a receber, com certa periodicidade, nossa niusleter Diário de borda, onde compartilhamos como estamos desenvolvendo, de maneira independente, um canto da Internet. Quanto o Bemte.li estiver operando, você poderá publicar e enviar sua niusleter por aqui ou acompanhar os textos de outros autores.
           </p>
         </div>
 
@@ -128,7 +128,7 @@ export default function SolicitarConvite() {
                   }
                   rows={8}
                   required
-                  placeholder="Conte sobre você e seu interesse em participar do Bemte.li"
+                  placeholder="conte sobre você e seu interesse no Bemte.li"
                   className="w-full border border-sombra bg-transparent p-4 focus:outline-none focus:border-sombra transition-colors resize-none text-sombra placeholder:text-sombra/60"
                 />
               </div>
@@ -146,7 +146,7 @@ export default function SolicitarConvite() {
                   disabled={isLoading}
                   className="bg-citrino px-6 py-2 text-sm hover:bg-citrino/90 transition-colors text-sombra disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? 'Enviando...' : 'Solicitar convite'}
+                  {isLoading ? 'Enviando...' : 'Enviar'}
                 </button>
               </div>
             </form>
