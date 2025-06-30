@@ -82,6 +82,7 @@ test: ## Run tests
 lint: ## Run linters
 	@echo "$(BOLD)Running linters...$(RESET)"
 	@cd frontend && npm run lint
+	@echo "$(BOLD)Running backend linters...$(RESET)"
 	@cd backend && go vet ./...
 
 # Default target
