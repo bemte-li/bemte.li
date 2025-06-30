@@ -1,4 +1,10 @@
-# Bemte.li
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="frontend/public/Logo-Horizontal-White.svg">
+    <source media="(prefers-color-scheme: light)" srcset="frontend/public/Logo-Horizontal.svg">
+    <img src="frontend/public/Logo-Horizontal.svg" alt="Bemte.li Logo" width="400">
+  </picture>
+</div>
 
 > Uma alternativa de niusleter 100% brasileira, gratuita e de código aberto.
 
