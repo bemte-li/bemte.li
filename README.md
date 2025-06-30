@@ -1,96 +1,142 @@
-# Bemteli
+# Bemte.li
 
-## Development Setup
+> Uma alternativa de niusleter 100% brasileira, gratuita e de código aberto.
 
-### Prerequisites
+## O que é o Bemte.li?
 
-- Docker and Docker Compose
-- Node.js 18+ (for local development)
-- OpenSSL (usually pre-installed on most systems)
-- Make
+O Bemte.li não é uma plataforma, nem um aplicativo. Não tem anúncios, não tem empresários, não tem visão de lucro. Não é uma rede social algoritmizada e algoritmizável. **O Bemte.li envia e-mails e arquiva seus conteúdos num endereço na Internet.**
 
-### Getting Started
+Este projeto nasce da convicção (ingênua, porém convicção) de **fazer algo, na internet, que ruma na contramão do feudalismo digital.** Desenvolvido por três pessoas – uma designer, um programador e um escritor – com vontade de resgatar um canto da internet que foi desmantelado pelo capitalismo de plataforma.
 
-1. Clone the repository:
+### Nossa Filosofia
+
+- **Contra o capitalismo de plataforma**: Substack não é sinônimo de niusleter
+- **Internet feita pelas pessoas comuns**: Não por grandes empresas privadas
+- **Código aberto e transparente**: Como quem te oferece um pedaço de bolo e logo te dá a receita
+- **Processo humano**: Sem pressa e sem pausa, no tempo que tiver que ser
+- **Independência técnica**: Hospedamos nosso próprio servidor de e-mail
+- **Arrecadação coletiva**: Sem anúncios, sem visão de lucro
+
+## 🛠 Stack Tecnológico
+
+### Frontend
+- **Next.js 14** - Framework React para produção
+- **TypeScript** - Tipagem estática
+- **Tailwind CSS** - Framework CSS utilitário
+- **TipTap** - Editor de texto rico
+
+### Backend
+- **Go** - Linguagem de programação
+- **PocketBase** - Backend-as-a-Service em Go
+- **SQLite** - Banco de dados
+- **Stalwart Mail Server** - Servidor de e-mail próprio
+
+### Infraestrutura
+- **Docker & Docker Compose** - Containerização
+- **Nginx** - Proxy reverso e servidor web
+- **Let's Encrypt** - Certificados SSL/TLS
+- **SMTP4Dev** - Servidor de e-mail para desenvolvimento
+
+## 🚀 Como Começar
+
+### Pré-requisitos
+
+- Docker e Docker Compose
+- Make (para comandos automatizados)
+- Node.js 18+ (opcional, para desenvolvimento local)
+
+### Configuração Inicial
+
+1. **Clone o repositório:**
 ```bash
-git clone https://github.com/yourusername/bemteli.git
-cd bemteli
+git clone https://github.com/bemte-li/bemte.li.git
+cd bemte.li
 ```
 
-2. Run the development setup:
+2. **Configure o ambiente de desenvolvimento:**
 ```bash
 make setup
 ```
 
-3. Start the development environment:
+3. **Inicie o ambiente de desenvolvimento:**
 ```bash
 make dev
 ```
 
-### Available Make Commands
+### Acessando os Serviços
 
-```bash
-make help          # Show all available commands
-make setup         # Initial development setup
-make dev           # Start development environment
-make down          # Stop development environment
-make restart       # Restart development environment
-make logs          # Show logs from all containers
-make frontend-logs # Show frontend logs
-make backend-logs  # Show backend logs
-make mail-logs     # Show mail server logs
-make clean         # Clean up development environment (requires sudo)
-make test         # Run tests
-make lint         # Run linters
+Após iniciar o ambiente, você pode acessar:
+
+- **Frontend**: https://localhost
+- **API Backend**: https://api.localhost  
+- **Interface de E-mail**: https://mail.localhost
+
+> **Nota**: Como usamos certificados auto-assinados para desenvolvimento, seu navegador mostrará um aviso de segurança. Isso é esperado e seguro para desenvolvimento local.
+
+## 📋 Comandos Make
+
+| Comando | Descrição |
+|---------|-----------|
+| `make help` | Mostra todos os comandos disponíveis |
+| `make setup` | Configuração inicial do ambiente de desenvolvimento |
+| `make dev` | Inicia o ambiente de desenvolvimento |
+| `make down` | Para o ambiente de desenvolvimento |
+| `make restart` | Reinicia o ambiente de desenvolvimento |
+| `make logs` | Mostra logs de todos os containers |
+| `make frontend-logs` | Mostra logs do frontend |
+| `make backend-logs` | Mostra logs do backend |
+| `make mail-logs` | Mostra logs do servidor de e-mail |
+| `make clean` | Limpa completamente o ambiente (requer sudo) |
+| `make test` | Executa os testes |
+| `make lint` | Executa os linters |
+| `make squash-migrations` | Compacta as migrações do banco |
+
+## 🔧 Desenvolvimento
+
+### Usuário de Desenvolvimento
+
+No modo de desenvolvimento, uma conta de superusuário é criada automaticamente:
+- **E-mail**: dev@bemte.li
+- **Senha**: dev1234567
+
+### Fluxo de Trabalho
+
+- O frontend roda em modo de desenvolvimento com hot-reloading
+- O backend usa Air para hot-reloading automático
+- Migrações do banco são aplicadas automaticamente
+- Mudanças no código são refletidas automaticamente
+
+### Estrutura do Projeto
+
+```
+bemteli/
+├── frontend/          # Aplicação Next.js
+│   ├── src/
+│   │   ├── app/      # App Router do Next.js
+│   │   ├── components/ # Componentes React
+│   │   └── lib/      # Utilitários e configurações
+├── backend/          # API PocketBase em Go
+│   ├── internal/     # Código interno da aplicação
+│   ├── migrations/   # Migrações do banco de dados
+│   └── pb_data/     # Dados do PocketBase
+├── docker/          # Configurações Docker
+│   ├── nginx/       # Configurações do Nginx
+│   └── scripts/     # Scripts de automação
+└── terraform/       # Infraestrutura como código
 ```
 
-Note: The `clean` command requires sudo privileges to remove Docker volume directories.
+## 🤝 Como contribuir
 
-### Accessing Local Services
+- **Reportar bugs**: Se você encontrar um problema, abra uma issue.
 
-Once the environment is running, you can access:
+Por enquanto este projeto é mantido por um único desenvolvedor. Tenha paciência. E se você quiser contribuir, fique à vontade.
 
-- Frontend: https://localhost
-- Backend API: https://api.localhost
-- Mail Server Interface: https://mail.localhost
+## 📝 Licença
 
-Note: Since we're using self-signed certificates for local development, your browser will show a security warning. This is expected and safe for local development.
+Este projeto é de código aberto. A licença específica será definida em breve.
 
-### Development Workflow
+## 📞 Contato
 
-- The frontend runs in development mode with hot-reloading enabled
-- Changes to the frontend code will automatically reflect in the browser
-- Backend runs with Air for hot-reloading:
-  - Changes to Go files will automatically trigger a rebuild
-  - No manual container restart needed for most changes
-  - Database migrations are automatically applied in development mode
-
-### Development Superuser
-
-In development mode, a default superuser account is automatically created with the following credentials:
-- Email: dev@bemte.li
-- Password: dev1234567
-
-You can use these credentials to access the admin interface and manage your development environment.
-
-### Troubleshooting
-
-1. Certificate Issues
-   - If you see certificate warnings, this is normal for local development
-   - You can regenerate certificates by running `make clean` followed by `make setup`
-
-2. Port Conflicts
-   - If you see port binding errors, make sure no other services are using ports 80, 443, 3000, or 8090
-   - Stop conflicting services or modify the port mappings in `docker/docker-compose.dev.yml`
-
-3. Host Resolution
-   - If you can't access the services, verify your `/etc/hosts` entries
-   - Run `make setup` again to add missing entries
-
-4. Clean Start
-   - If you're experiencing unexpected issues, try a clean start:
-     ```bash
-     make clean   # Remove all development data
-     make setup   # Set up fresh environment
-     make dev     # Start development environment
-     ```
+- **Site**: [bemte.li](https://bemte.li)
+- **GitHub**: [github.com/bemte-li/bemte.li](https://github.com/bemte-li/bemte.li)
+- **E-mail**: [nos@bemte.li](mailto:nos@bemte.li)
