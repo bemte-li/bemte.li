@@ -9,12 +9,12 @@ interface AdminLink {
 
 const links: AdminLink[] = [
   {
-    href: '/exemplo-nius-pag',
+    href: '/diario-de-borda',
     title: 'Exemplo de niusleter',
     description: 'Visualize o exemplo de niusleter com textos simulados'
   },
   {
-    href: '/exemplo-texto',
+    href: '/diario-de-borda/diario-de-borda-01',
     title: 'Exemplo de Texto',
     description: 'Visualize um exemplo de texto com conteúdo completo'
   },

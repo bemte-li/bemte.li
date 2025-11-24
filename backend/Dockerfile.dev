@@ -3,21 +3,19 @@ FROM golang:1.24-alpine
 
 WORKDIR /app
 
-# Install development dependencies
-RUN apk add --no-cache git
+# Install development dependencies and air in a single layer
+RUN apk add --no-cache git && \
+    go install github.com/air-verse/air@v1.62.0
 
-# Install air for hot reloading
-RUN go install github.com/air-verse/air@latest
-
-# Copy go mod files
+# Copy go mod files first for better caching
 COPY go.mod go.sum ./
 
-# Download dependencies
-RUN go mod download
+# Download dependencies with build cache
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
-# Copy the rest of the application
+# Copy source code and config
 COPY . .
-COPY .air.toml .
 
 EXPOSE 8090
 

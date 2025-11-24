@@ -70,8 +70,7 @@ clean: ## Clean up development environment (removes volumes, certificates)
 	@${DC_DEV} down -v --remove-orphans
 	@echo "$(BOLD)Removing directories (requires sudo)...$(RESET)"
 	@sudo rm -rf docker/nginx/ssl
-	@sudo rm -rf docker/backend/pb_data
-	@sudo rm -rf docker/stalwart
+	@sudo rm -rf backend/pb_data
 	@echo "$(GREEN)Cleanup complete!$(RESET)"
 
 test: ## Run tests

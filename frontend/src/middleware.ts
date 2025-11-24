@@ -11,9 +11,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  return NextResponse.next();
+
   // Redirect all other routes to the home page
   url.pathname = '/';
-  return NextResponse.redirect(url);
+  // return NextResponse.redirect(url);
 }
 
 // Configure the middleware to run on specific paths

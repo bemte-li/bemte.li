@@ -31,6 +31,7 @@ services:
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_POCKETBASE_URL=http://api.localhost
+      - POCKETBASE_INTERNAL_URL=http://pocketbase:8090
     networks:
       - web
 
@@ -39,10 +40,16 @@ services:
       context: ../backend
       dockerfile: Dockerfile.dev
     volumes:
+      # Go module cache for faster builds
       - backend_go_mod_cache:/go/pkg/mod
-      - ../backend/pb_data:/app/tmp/pb_data
-      - ../backend/migrations:/app/tmp/migrations
+      # Build artifacts and temporary files
+      - backend_tmp:/app/tmp
+      # Source code for hot reloading
       - ../backend:/app
+      # PocketBase data directory (persistent)
+      - ../backend/pb_data:/app/pb_data
+      # Migration files (needed for runtime)
+      - ../backend/migrations:/app/migrations
     env_file:
       - .env.development
     environment:
@@ -72,6 +79,7 @@ volumes:
   smtp4dev-data:
   frontend_node_modules:
   backend_go_mod_cache:
+  backend_tmp:
 
 networks:
   web:

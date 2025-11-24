@@ -31,6 +31,7 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_POCKETBASE_URL=https://api.bemte.li
+      - POCKETBASE_INTERNAL_URL=http://pocketbase:8090
     networks:
       - web
 

@@ -23,7 +23,7 @@ export function AuthorBio({ name, bio, imageUrl }: AuthorBioProps) {
           Escrito por
           <div className="font-bold text-2xl">{name}</div>
         </h2>
-        <p className="text-sm">{bio}</p>
+        <div className="text-sm" dangerouslySetInnerHTML={{ __html: bio }} />
       </div>
     </div>
   )
