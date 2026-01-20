@@ -44,7 +44,7 @@ export default async function TextoPage({ params }: PageProps) {
 
   return (
     <>
-      <Navbar pageName={texto.expand?.niusleter?.nome || niusleter.nome} isLoggedIn={false} />
+      <Navbar niusleter={texto.expand?.niusleter || niusleter} isLoggedIn={false} />
       <div className="max-w-3xl mx-auto px-4 py-8">
         <article className="prose lg:prose-xl">
           <div className="flex items-center mb-6">
