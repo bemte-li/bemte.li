@@ -1,30 +1,54 @@
 import PocketBase from 'pocketbase';
 import type { Usuario, Texto, Niusleter, Inscrito, Convite } from './types';
 
-// Get the PocketBase URL from environment variable or use fallback
+// Obtém a URL do PocketBase da variável de ambiente
 const getPocketBaseUrl = () => {
   if (typeof window === 'undefined') {
-    // Server-side: use internal Docker network URL
+    // Lado servidor: usa URL interna da rede Docker
     if (!process.env.POCKETBASE_INTERNAL_URL) {
-      console.error('[PocketBase] Error: POCKETBASE_INTERNAL_URL environment variable is not set.');
-      throw new Error('POCKETBASE_INTERNAL_URL environment variable is required for server-side PocketBase requests.');
+      console.error('[PocketBase] Erro: variável POCKETBASE_INTERNAL_URL não definida.');
+      throw new Error('POCKETBASE_INTERNAL_URL é necessária para requisições server-side.');
     }
     return process.env.POCKETBASE_INTERNAL_URL;
   }
-  // Client-side: use public URL
+  // Lado cliente: usa URL pública
   if (!process.env.NEXT_PUBLIC_POCKETBASE_URL) {
-    console.error('[PocketBase] Error: NEXT_PUBLIC_POCKETBASE_URL environment variable is not set.');
-    throw new Error('NEXT_PUBLIC_POCKETBASE_URL environment variable is required for client-side PocketBase requests.');
+    console.error('[PocketBase] Erro: variável NEXT_PUBLIC_POCKETBASE_URL não definida.');
+    throw new Error('NEXT_PUBLIC_POCKETBASE_URL é necessária para requisições client-side.');
   }
   return process.env.NEXT_PUBLIC_POCKETBASE_URL;
 };
 
-// For client-side operations
+// Obtém a URL pública do PocketBase (para URLs de arquivos acessíveis pelo navegador)
+export const getPublicPocketBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_POCKETBASE_URL || '';
+};
+
+/**
+ * Constrói a URL completa para um arquivo do PocketBase.
+ * O PocketBase armazena apenas o nome do arquivo - esta função monta a URL completa.
+ * 
+ * @param collectionName - Nome da coleção (ex: 'niusleteres')
+ * @param recordId - ID do registro
+ * @param filename - Nome do arquivo armazenado no registro
+ * @returns URL completa para acessar o arquivo, ou string vazia se não houver arquivo
+ */
+export const getPocketBaseFileUrl = (
+  collectionName: string,
+  recordId: string,
+  filename: string | undefined
+): string => {
+  if (!filename) return '';
+  const baseUrl = getPublicPocketBaseUrl();
+  return `${baseUrl}/api/files/${collectionName}/${recordId}/${filename}`;
+};
+
+// Instância para operações client-side
 let clientSideInstance: PocketBase | null = null;
 
 export const getClientSideInstance = () => {
   if (typeof window === 'undefined') {
-    throw new Error('Client-side PocketBase instance cannot be used server-side');
+    throw new Error('Instância client-side não pode ser usada no servidor');
   }
   
   if (!clientSideInstance) {
@@ -35,28 +59,28 @@ export const getClientSideInstance = () => {
   return clientSideInstance;
 };
 
-// For server-side operations (in Server Components or API routes)
+// Para operações server-side (em Server Components ou API routes)
 export const getServerSideInstance = () => {
   const url = getPocketBaseUrl();
-  console.log('[PocketBase] Using URL:', url);
+  console.log('[PocketBase] Usando URL:', url);
   return new PocketBase(url);
 };
 
-// Type for convite data based on the collection schema
+// Tipo para dados de convite baseado no schema da coleção
 export interface ConviteData {
   email?: string;
   nome?: string;
   sobre?: string;
 }
 
-// Type for inscrito data based on the collection schema
+// Tipo para dados de inscrito baseado no schema da coleção
 export interface InscritoData {
   email: string;
   nota?: string;
   niusleter: string;
 }
 
-// API functions
+// Funções de API
 export const createConvite = async (data: ConviteData) => {
   const pb = getClientSideInstance();
   try {
