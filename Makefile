@@ -4,7 +4,7 @@ squash-migrations:
 	@echo "Squashing migrations"
 	@cd backend && APP_ENV=development go run . migrate history-sync
 
-.PHONY: setup dev down restart logs clean help test lint run-backend run-frontend build-backend squash-migrations
+.PHONY: dev down restart logs clean help test lint run-backend run-frontend build-backend squash-migrations
 
 # Colors (using tput with fallback)
 COLORIZE := $(shell test -t 0 && echo 1 || echo 0)
@@ -31,19 +31,19 @@ help: ## Show this help message
 	@echo '$(BOLD)Targets:$(RESET)'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(BLUE)%-15s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-setup: ## Initial development setup
-	@echo "$(BOLD)Setting up development environment...$(RESET)"
-	@cd docker && chmod +x setup-dev.sh && ./setup-dev.sh
-
 dev: ## Start development environment
 	@echo "$(BOLD)Starting development environment...$(RESET)"
 	@${DC_DEV} down --remove-orphans
-	@${DC_DEV} build --no-cache pocketbase
+	@${DC_DEV} build pocketbase
 	@${DC_DEV} up -d
 	@echo "$(GREEN)Development environment is running!$(RESET)"
-	@echo "Frontend: $(BLUE)https://localhost$(RESET)"
-	@echo "Backend:  $(BLUE)https://api.localhost$(RESET)"
-	@echo "Mail UI:  $(BLUE)https://mail.localhost$(RESET)"
+	@echo "Frontend: $(BLUE)http://localhost:3030$(RESET)"
+	@echo "Backend:  $(BLUE)http://localhost:8090/_/$(RESET)"
+	@echo "Mail UI:  $(BLUE)http://localhost:8025$(RESET)"
+	@echo ""
+	@echo "$(BOLD)Dev credentials:$(RESET)"
+	@echo "Email:    $(BLUE)dev@bemte.li$(RESET)"
+	@echo "Password: $(BLUE)dev1234567$(RESET)"
 
 down: ## Stop development environment
 	@echo "$(BOLD)Stopping development environment...$(RESET)"
@@ -65,11 +65,10 @@ backend-logs: ## Show backend logs
 mail-logs: ## Show mail server logs
 	@${DC_DEV} logs -f stalwart
 
-clean: ## Clean up development environment (removes volumes, certificates)
+clean: ## Clean up development environment (removes volumes)
 	@echo "$(BOLD)Cleaning up development environment...$(RESET)"
 	@${DC_DEV} down -v --remove-orphans
 	@echo "$(BOLD)Removing directories (requires sudo)...$(RESET)"
-	@sudo rm -rf docker/nginx/ssl
 	@sudo rm -rf backend/pb_data
 	@echo "$(GREEN)Cleanup complete!$(RESET)"
 

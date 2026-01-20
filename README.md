@@ -59,12 +59,7 @@ git clone https://github.com/bemte-li/bemte.li.git
 cd bemte.li
 ```
 
-2. **Configure o ambiente de desenvolvimento:**
-```bash
-make setup
-```
-
-3. **Inicie o ambiente de desenvolvimento:**
+2. **Inicie o ambiente de desenvolvimento:**
 ```bash
 make dev
 ```
@@ -73,18 +68,15 @@ make dev
 
 Após iniciar o ambiente, você pode acessar:
 
-- **Frontend**: https://localhost
-- **API Backend**: https://api.localhost  
-- **Interface de E-mail**: https://mail.localhost
-
-> **Nota**: Como usamos certificados auto-assinados para desenvolvimento, seu navegador mostrará um aviso de segurança. Isso é esperado e seguro para desenvolvimento local.
+- **Frontend**: http://localhost:3030
+- **API Backend**: http://localhost:8090/_/
+- **Interface de E-mail**: http://localhost:8025
 
 ## 📋 Comandos Make
 
 | Comando | Descrição |
 |---------|-----------|
 | `make help` | Mostra todos os comandos disponíveis |
-| `make setup` | Configuração inicial do ambiente de desenvolvimento |
 | `make dev` | Inicia o ambiente de desenvolvimento |
 | `make down` | Para o ambiente de desenvolvimento |
 | `make restart` | Reinicia o ambiente de desenvolvimento |

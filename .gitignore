@@ -26,9 +26,6 @@ pb_data/
 .env.*
 !.env.example
 
-# SSL certificates
-docker/nginx/ssl/
-
 # Development data
 docker/backend/pb_data/
 docker/stalwart/
