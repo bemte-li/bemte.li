@@ -236,7 +236,7 @@ func init() {
 					"values": [
 						"title_only",
 						"title_image_horizontal",
-						"title_with_3x4_photo",
+						"title_with_3x4_photo"
 					]
 				},
 				{
