@@ -66,7 +66,7 @@ export default async function NiusleterPage({ params }: PageProps) {
                 </p>
               </Link>
               <div className="text-sm font-mono text-neutral-600">
-                POR {texto.rodape_autor || 'AUTOR DESCONHECIDO'}
+                POR {texto.expand?.rodape?.autor || 'AUTOR DESCONHECIDO'}
               </div>
             </article>
           ))

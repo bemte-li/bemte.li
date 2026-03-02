@@ -21,20 +21,30 @@ export interface Niusleter {
   };
 }
 
+export interface Rodape {
+  id: string;
+  autor: string;
+  descricao: string;
+  foto?: string;
+  hash: string;
+  niusleter: string;
+  created: string;
+  updated: string;
+}
+
 export interface Texto {
   id: string;
   titulo: string;
   corpo: string;
   enviado?: string;
   caminho: string;
-  rodape_autor: string;
-  rodape_descricao: string;
-  rodape_field?: string;
+  rodape?: string;
   niusleter: string;
   created: string;
   updated: string;
   expand?: {
     niusleter: Niusleter;
+    rodape?: Rodape;
   };
 }
 

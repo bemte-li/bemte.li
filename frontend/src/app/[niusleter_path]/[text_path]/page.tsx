@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Highlight } from '@/components/Highlight'
 import { AuthorBio } from '@/components/AuthorBio'
-import { getTextoByPath, getNiusleterByPath } from '@/lib/pocketbase'
+import { getTextoByPath, getNiusleterByPath, getPocketBaseFileUrl } from '@/lib/pocketbase'
 import type { Texto, Niusleter } from '@/lib/types'
 import { Navbar } from '@/components/Navbar'
 
@@ -64,11 +64,15 @@ export default async function TextoPage({ params }: PageProps) {
           <div className="font-serif text-sombra" dangerouslySetInnerHTML={{ __html: texto.corpo || '' }} />
 
           <div className="mt-16">
-            {texto.rodape_autor && (
+            {texto.expand?.rodape?.autor && (
               <AuthorBio
-                name={texto.rodape_autor}
-                bio={texto.rodape_descricao || ''}
-                imageUrl={texto.rodape_field || '/Logo-Vertical.svg'}
+                name={texto.expand.rodape.autor}
+                bio={texto.expand.rodape.descricao || ''}
+                imageUrl={
+                  texto.expand.rodape.foto
+                    ? getPocketBaseFileUrl('rodapes', texto.expand.rodape.id, texto.expand.rodape.foto)
+                    : '/Logo-Vertical.svg'
+                }
               />
             )}
           </div>

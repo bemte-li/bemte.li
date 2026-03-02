@@ -51,6 +51,7 @@ func InitApp() *pocketbase.PocketBase {
 // registerHooksFromPackage registers all hooks from the hooks package
 func registerHooksFromPackage(app *pocketbase.PocketBase) error {
 	hooks.RegisterConviteHooks(app)
+	hooks.RegisterRodapeHooks(app)
 	return nil
 }
 

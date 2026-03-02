@@ -1,5 +1,5 @@
 import PocketBase from 'pocketbase';
-import type { Usuario, Texto, Niusleter, Inscrito, Convite } from './types';
+import type { Usuario, Texto, Niusleter, Inscrito, Convite, Rodape } from './types';
 
 // Obtém a URL do PocketBase da variável de ambiente
 const getPocketBaseUrl = () => {
@@ -109,7 +109,7 @@ export const getTextosByNiusleter = async (niusleterId: string): Promise<Texto[]
     console.log('[PocketBase] Fetching textos by niusleterId:', niusleterId);
     const textos = await pb.collection('textos').getFullList<Texto>({
       filter: `niusleter="${niusleterId}"`,
-      expand: 'niusleter,niusleter.usuario',
+      expand: 'niusleter,niusleter.usuario,rodape',
       sort: '-created',
     });
     console.log('[PocketBase] Textos found:', textos);
@@ -125,7 +125,7 @@ export const getTextoByPath = async (path: string): Promise<Texto> => {
   try {
     console.log('[PocketBase] Fetching texto by path:', path);
     const texto = await pb.collection('textos').getFirstListItem<Texto>(`caminho="${path}"`, {
-      expand: 'niusleter,niusleter.usuario',
+      expand: 'niusleter,niusleter.usuario,rodape',
     });
     console.log('[PocketBase] Texto found:', texto);
     return texto;
