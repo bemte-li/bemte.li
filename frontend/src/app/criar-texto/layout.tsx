@@ -7,7 +7,7 @@ export default function CriarTextoLayout({
 }) {
   return (
     <div>
-      <Navbar pageName="Desculpa Incomodar" isLoggedIn={false} />
+      <Navbar pageName="Nome da niusleter" isLoggedIn={false} />
       <div className="max-w-3xl mx-auto px-4 py-8">
         {children}
       </div>

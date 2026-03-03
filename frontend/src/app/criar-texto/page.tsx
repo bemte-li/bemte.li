@@ -1,29 +1,96 @@
 'use client'
 
-import React, { useState, useEffect, memo, KeyboardEvent } from 'react'
+import React, { useState, useEffect, memo, KeyboardEvent, useCallback } from 'react'
 import Link from 'next/link'
 import { Highlight } from '@/components/Highlight'
-import { AuthorBio } from '@/components/AuthorBio'
 import TextEditor from '@/components/editor'
+import RodapeEditor, { type RodapeData } from '@/components/rodape-editor'
+import ScrollToTop from '@/components/scroll-to-top'
+import { useAutosave, type AutosaveStatus, type DraftData } from '@/hooks/useAutosave'
 
-const BioSection = () => (
-  <div className="mt-16">
-    <AuthorBio 
-      name="Luana Adriano"
-      bio="Luana constrói o Bemte.li, lê pensa & escreve sobre internet, política, trabalho e o colapso civilizatório em curso."
-      imageUrl="https://placehold.co/300x400"
-    />
-  </div>
-)
+// ── Autosave status label ────────────────────────────────────────────────────
+
+function AutosaveIndicator({ status }: { status: AutosaveStatus }) {
+  const labels: Record<AutosaveStatus, string> = {
+    idle: '',
+    saving: 'Salvando…',
+    saved: 'Rascunho salvo',
+    error: 'Erro ao salvar',
+  }
+  if (!labels[status]) return null
+  return (
+    <span className="text-xs text-sombra/50 font-mono transition-opacity">
+      {labels[status]}
+    </span>
+  )
+}
+
+// ── Draft recovery banner ────────────────────────────────────────────────────
+
+interface DraftBannerProps {
+  onRestore: () => void
+  onDiscard: () => void
+}
+
+function DraftBanner({ onRestore, onDiscard }: DraftBannerProps) {
+  return (
+    <div className="mb-6 border border-citrino bg-citrino/10 px-4 py-3 flex items-center gap-4 text-sm text-sombra">
+      <span className="flex-1">
+        Rascunho recuperado. Deseja continuar de onde parou?
+      </span>
+      <button
+        onClick={onRestore}
+        className="bg-citrino text-sombra px-4 py-1 text-xs hover:bg-citrino/80 transition-colors"
+      >
+        Continuar
+      </button>
+      <button
+        onClick={onDiscard}
+        className="border border-sombra/30 text-sombra px-4 py-1 text-xs hover:border-sombra transition-colors"
+      >
+        Descartar
+      </button>
+    </div>
+  )
+}
+
+// ── Publish tooltip button ───────────────────────────────────────────────────
+
+function PublishButton() {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <div className="relative">
+      <button
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onFocus={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
+        className="border border-sombra text-sombra px-6 py-2 text-sm opacity-60 cursor-not-allowed"
+        aria-disabled="true"
+      >
+        Publicar
+      </button>
+      {hovered && (
+        <div className="absolute right-0 top-full mt-1 bg-sombra text-marfim text-xs px-3 py-2 whitespace-nowrap z-50">
+          Em breve — login necessário
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── PreviewMode ──────────────────────────────────────────────────────────────
 
 interface PreviewModeProps {
   title: string
   content: string
   currentDate: string
+  rodape: RodapeData
   onEdit: () => void
 }
 
-const PreviewMode = memo(({ title, content, currentDate, onEdit }: PreviewModeProps) => (
+const PreviewMode = memo(({ title, content, currentDate, rodape, onEdit }: PreviewModeProps) => (
+  <>
   <article className="prose lg:prose-xl">
     <div className="flex items-center justify-between mb-6">
       <Link href="/" className="text-black no-underline">
@@ -37,74 +104,113 @@ const PreviewMode = memo(({ title, content, currentDate, onEdit }: PreviewModePr
       </button>
     </div>
 
-    <div className="text-sm text-gray-600 mb-4 font-mono">
-      {currentDate}
-    </div>
+    <div className="text-sm text-gray-600 mb-4 font-mono">{currentDate}</div>
 
-    <h1 className="mt-0 mb-8 text-sombra">
-      {title || 'Sem título'}
-    </h1>
+    <h1 className="mt-0 mb-8 text-sombra">{title || 'Sem título'}</h1>
 
-    <div 
+    <div
       className="font-serif text-sombra"
       dangerouslySetInnerHTML={{ __html: content }}
     />
-
-    <BioSection />
   </article>
+
+  {/* Rodapé preview */}
+  <div className="mt-16 flex items-start gap-4 p-4 rounded-lg">
+    <div className="relative w-24 h-32 flex-shrink-0 border border-sombra overflow-hidden">
+      {rodape.fotoPreviewUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={rodape.fotoPreviewUrl} alt={`Foto de ${rodape.autor}`} className="object-cover w-full h-full block" />
+      ) : (
+        <div className="w-full h-full bg-sombra/10" />
+      )}
+    </div>
+    <div className="flex flex-col">
+      <h2 className="text-xl font-mono mb-2">
+        Escrito por
+        <div className="font-bold text-2xl">{rodape.autor || '—'}</div>
+      </h2>
+      <div
+        className="text-sm"
+        dangerouslySetInnerHTML={{ __html: rodape.descricao }}
+      />
+    </div>
+  </div>
+  </>
 ))
+PreviewMode.displayName = 'PreviewMode'
+
+// ── EditMode ─────────────────────────────────────────────────────────────────
 
 interface EditModeProps {
   title: string
   content: string
   currentDate: string
+  rodape: RodapeData
+  autosaveStatus: AutosaveStatus
   onTitleChange: (value: string) => void
   onPreview: () => void
   onEditorUpdate: (html: string) => void
+  onRodapeChange: (data: RodapeData) => void
+  onSave: () => void
 }
 
-const EditMode = memo(({ title, content, currentDate, onTitleChange, onPreview, onEditorUpdate }: EditModeProps) => {
+const EditMode = memo(({
+  title,
+  content,
+  currentDate,
+  rodape,
+  autosaveStatus,
+  onTitleChange,
+  onPreview,
+  onEditorUpdate,
+  onRodapeChange,
+  onSave,
+}: EditModeProps) => {
   const titleRef = React.useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
-    if (titleRef.current) {
-      // Only update if the content is different to avoid cursor jumping
-      if (titleRef.current.textContent !== title) {
-        titleRef.current.textContent = title
-      }
+    if (titleRef.current && titleRef.current.textContent !== title) {
+      titleRef.current.textContent = title
     }
   }, [title])
 
   const handleTitleKeyDown = (e: KeyboardEvent<HTMLHeadingElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-    }
+    if (e.key === 'Enter') e.preventDefault()
   }
 
   const handleTitleInput = (e: React.FormEvent<HTMLHeadingElement>) => {
     const newText = e.currentTarget.textContent || ''
-    if (newText !== title) {
-      onTitleChange(newText)
-    }
+    if (newText !== title) onTitleChange(newText)
   }
 
   return (
+    <>
     <div className="prose lg:prose-xl">
-      <div className="flex items-center justify-between mb-6">
+      {/* Top bar */}
+      <div className="flex items-center justify-between mb-6 not-prose">
         <Link href="/" className="text-black no-underline">
           <Highlight color="citrino" className="text-4xl">←</Highlight>
         </Link>
-        <button
-          onClick={onPreview}
-          className="bg-citrino px-6 py-2 text-sm hover:bg-citrino/90 transition-colors text-sombra"
-        >
-          Visualizar
-        </button>
+
+        <div className="flex items-center gap-3">
+          <AutosaveIndicator status={autosaveStatus} />
+          <button
+            onClick={onSave}
+            className="bg-citrino text-sombra px-6 py-2 text-sm hover:bg-citrino/90 transition-colors"
+          >
+            Salvar
+          </button>
+          <PublishButton />
+          <button
+            onClick={onPreview}
+            className="border border-sombra/30 text-sombra px-6 py-2 text-sm hover:border-sombra transition-colors"
+          >
+            Visualizar
+          </button>
+        </div>
       </div>
 
-      <div className="text-sm text-gray-600 mb-4 font-mono">
-        {currentDate}
-      </div>
+      <div className="text-sm text-gray-600 mb-4 font-mono">{currentDate}</div>
 
       <h1
         ref={titleRef}
@@ -120,46 +226,112 @@ const EditMode = memo(({ title, content, currentDate, onTitleChange, onPreview, 
       <div className="font-serif text-sombra">
         <TextEditor onUpdate={onEditorUpdate} initialContent={content} />
       </div>
-
-      <BioSection />
     </div>
+
+    <RodapeEditor value={rodape} onChange={onRodapeChange} />
+    </>
   )
 })
-
-PreviewMode.displayName = 'PreviewMode'
 EditMode.displayName = 'EditMode'
+
+// ── Page ─────────────────────────────────────────────────────────────────────
+
+const EMPTY_RODAPE: RodapeData = { autor: '', descricao: '', foto: null, fotoPreviewUrl: null }
 
 export default function CriarTexto() {
   const [isPreview, setIsPreview] = useState(false)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const currentDate = new Date().toLocaleString('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    year: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).toLowerCase()
+  const [rodape, setRodape] = useState<RodapeData>(EMPTY_RODAPE)
+  const [pendingDraft, setPendingDraft] = useState<DraftData | null>(null)
+  const [draftBannerVisible, setDraftBannerVisible] = useState(false)
 
-  const handleEditorUpdate = (html: string) => {
-    setContent(html)
+  const [currentDate, setCurrentDate] = useState('')
+  useEffect(() => {
+    setCurrentDate(
+      new Date().toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: 'short',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).toLowerCase()
+    )
+  }, [])
+
+  const draftData: DraftData = {
+    title,
+    content,
+    rodape: { autor: rodape.autor, descricao: rodape.descricao, foto: rodape.foto },
   }
 
-  return isPreview ? (
-    <PreviewMode 
-      title={title}
-      content={content}
-      currentDate={currentDate}
-      onEdit={() => setIsPreview(false)}
-    />
-  ) : (
-    <EditMode 
-      title={title}
-      content={content}
-      currentDate={currentDate}
-      onTitleChange={setTitle}
-      onPreview={() => setIsPreview(true)}
-      onEditorUpdate={handleEditorUpdate}
-    />
+  const { status, saveNow, loadDraft, clearDraft } = useAutosave(draftData)
+
+  // Check for existing draft on first render
+  useEffect(() => {
+    const draft = loadDraft()
+    if (draft && (draft.title || draft.content || draft.rodape.autor)) {
+      setPendingDraft(draft)
+      setDraftBannerVisible(true)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleRestoreDraft = () => {
+    if (!pendingDraft) return
+    setTitle(pendingDraft.title)
+    setContent(pendingDraft.content)
+    setRodape((prev) => ({
+      ...prev,
+      autor: pendingDraft.rodape.autor,
+      descricao: pendingDraft.rodape.descricao,
+      foto: pendingDraft.rodape.foto,
+    }))
+    setDraftBannerVisible(false)
+    setPendingDraft(null)
+  }
+
+  const handleDiscardDraft = () => {
+    clearDraft()
+    setDraftBannerVisible(false)
+    setPendingDraft(null)
+  }
+
+  const handleSave = useCallback(() => {
+    saveNow(draftData)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saveNow, title, content, rodape])
+
+  return (
+    <>
+      {draftBannerVisible && (
+        <DraftBanner onRestore={handleRestoreDraft} onDiscard={handleDiscardDraft} />
+      )}
+
+      {isPreview ? (
+        <PreviewMode
+          title={title}
+          content={content}
+          currentDate={currentDate}
+          rodape={rodape}
+          onEdit={() => setIsPreview(false)}
+        />
+      ) : (
+        <EditMode
+          title={title}
+          content={content}
+          currentDate={currentDate}
+          rodape={rodape}
+          autosaveStatus={status}
+          onTitleChange={setTitle}
+          onPreview={() => setIsPreview(true)}
+          onEditorUpdate={setContent}
+          onRodapeChange={setRodape}
+          onSave={handleSave}
+        />
+      )}
+
+      <ScrollToTop />
+    </>
   )
-} 
+}
