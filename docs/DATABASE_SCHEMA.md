@@ -1,7 +1,7 @@
 # Bemte.li Database Schema Documentation
 
 ## Overview
-This document describes the current database schema for the Bemte.li project, based on the PocketBase migrations. The system consists of 5 main collections with various relationships and permissions.
+This document describes the current database schema for the Bemte.li project, based on the PocketBase migrations. The system consists of 6 main collections with various relationships and permissions.
 
 ## Collections
 
@@ -69,7 +69,39 @@ This document describes the current database schema for the Bemte.li project, ba
 
 ---
 
-### 3. textos (Texts/Articles Collection)
+### 3. rodapes (Footers Collection)
+**Collection ID:** `pbc_rodapes`
+**Table Name:** `rodapes`
+
+**Fields:**
+- `id` (text, primary key) - Auto-generated 15-character alphanumeric ID
+- `autor` (text) - Footer author name
+- `descricao` (editor) - Footer description/bio (HTML content)
+- `foto` (file) - Footer image
+  - Accepted types: JPEG, PNG
+  - Max select: 1 file
+- `hash` (text, required) - Content hash for deduplication (12 chars, SHA256-based)
+- `niusleter` (relation, required) - Reference to niusleteres collection
+  - Max select: 1
+  - Cascade delete: false
+- `created` (autodate) - Creation timestamp
+- `updated` (autodate) - Last update timestamp
+
+**Indexes:**
+- Unique composite index on (`hash`, `niusleter`) - prevents duplicate rodapes per newsletter
+
+**Permissions:**
+- `listRule`: "" (public read access)
+- `viewRule`: "" (public read access)
+- `createRule`: null (admin only - managed automatically by backend hooks)
+- `updateRule`: null (immutable - rodapes cannot be edited, only new ones created)
+- `deleteRule`: null (admin only)
+
+**Note:** Rodapes are immutable and deduplicated by content hash. When creating/updating a texto, the backend automatically finds or creates a matching rodape. Multiple textos can share the same rodape record, avoiding file duplication.
+
+---
+
+### 4. textos (Texts/Articles Collection)
 **Collection ID:** `pbc_2443867158`
 **Table Name:** `textos`
 
@@ -80,11 +112,9 @@ This document describes the current database schema for the Bemte.li project, ba
 - `enviado` (date) - Date when article was sent/published
 - `caminho` (text, required) - URL path/slug
   - Pattern: `^[a-z0-9-]+$` (lowercase letters, numbers, hyphens only)
-- `rodape_autor` (text) - Footer author name
-- `rodape_descricao` (editor) - Footer description/content (HTML)
-- `rodape_field` (file) - Footer image/attachment
-  - Accepted types: JPEG, PNG
-  - Max select: 1 file
+- `rodape` (relation) - Reference to rodapes collection
+  - Max select: 1
+  - Cascade delete: false
 - `niusleter` (relation) - Reference to niusleteres collection
   - Max select: 1
   - Cascade delete: false
@@ -98,9 +128,11 @@ This document describes the current database schema for the Bemte.li project, ba
 - `updateRule`: null (admin only)
 - `deleteRule`: null (admin only)
 
+**Note:** When creating/updating a texto via the API, you can send `rodape_autor`, `rodape_descricao`, and `rodape_foto` fields. A backend hook will automatically find or create the appropriate rodape record and set the relation.
+
 ---
 
-### 4. inscritos (Subscribers Collection)
+### 5. inscritos (Subscribers Collection)
 **Collection ID:** `pbc_1506696262`
 **Table Name:** `inscritos`
 
@@ -123,7 +155,7 @@ This document describes the current database schema for the Bemte.li project, ba
 
 ---
 
-### 5. convites (Invitations Collection)
+### 6. convites (Invitations Collection)
 **Collection ID:** `pbc_2261426176`
 **Table Name:** `convites`
 
@@ -154,7 +186,15 @@ This document describes the current database schema for the Bemte.li project, ba
    - One newsletter can have many texts
    - Field: `textos.niusleter`
 
-3. **niusleteres → inscritos** (1:N, optional)
+3. **niusleteres → rodapes** (1:N)
+   - One newsletter can have many rodapes (footer versions)
+   - Field: `rodapes.niusleter`
+
+4. **rodapes → textos** (1:N)
+   - One rodape can be used by many texts
+   - Field: `textos.rodape`
+
+5. **niusleteres → inscritos** (1:N, optional)
    - One newsletter can have many subscribers
    - Field: `inscritos.niusleter`
 
@@ -162,8 +202,28 @@ This document describes the current database schema for the Bemte.li project, ba
 ```
 usuarios (1) ←→ (1) niusleteres
 niusleteres (1) ←→ (N) textos
+niusleteres (1) ←→ (N) rodapes
+rodapes (1) ←→ (N) textos
 niusleteres (1) ←→ (N) inscritos
 ```
+
+## Rodape Deduplication System
+
+The rodapes collection uses a content-based hash for automatic deduplication:
+
+### How it works:
+1. When a texto is created/updated with rodape data (`rodape_autor`, `rodape_descricao`, `rodape_foto`)
+2. The backend hook computes a SHA256 hash of the content: `hash(autor|descricao|foto_filename)`
+3. It searches for an existing rodape with the same hash for the same newsletter
+4. If found: reuses the existing rodape (no duplication)
+5. If not found: creates a new rodape record
+6. The texto is linked to the rodape via the `rodape` relation
+
+### Benefits:
+- **No file duplication**: Same footer image is stored once, even if used by 100 texts
+- **Automatic versioning**: Changing rodape content creates a new version
+- **Historical preservation**: Old texts keep their original rodape
+- **Transparent to clients**: API accepts rodape fields directly on texto, backend handles the rest
 
 ## Seeded Data
 
@@ -185,8 +245,7 @@ The database includes seeded data for a "Diário de borda" (Ship's Log) example:
 - **Sent Date:** `2025-06-25T01:11:00Z`
 - **Content:** Full HTML content about the Bemte.li project
 - **Newsletter:** Links to the test newsletter above
-- **Footer Author:** `Felipe, luana e Luccas`
-- **Footer Description:** `<a href="mailto:nos@bemte.li">nos@bemte.li</a>`
+- **Rodape:** Linked to a rodape record with author "Felipe, luana e Luccas"
 
 ## Security & Access Control
 
@@ -194,12 +253,14 @@ The database includes seeded data for a "Diário de borda" (Ship's Log) example:
 - **usuarios**: Read-only access to user profiles (auth data only)
 - **niusleteres**: Read-only access to newsletter profiles
 - **textos**: Read-only access to published articles
+- **rodapes**: Read-only access to footer content
 - **convites**: Can create new invitation requests
 
 ### Admin Only:
 - **niusleteres**: Newsletter creation/editing
 - **inscritos**: Full subscriber management
-- **textos**: Article creation/editing (including embedded footer content)
+- **textos**: Article creation/editing
+- **rodapes**: Managed automatically by backend hooks (immutable)
 - **convites**: Invitation approval/management
 
 ## Technical Notes
@@ -207,7 +268,7 @@ The database includes seeded data for a "Diário de borda" (Ship's Log) example:
 ### PocketBase Configuration:
 - Uses PocketBase's built-in authentication system
 - Custom collection names in Portuguese
-- File uploads supported for user photos and article footer images
+- File uploads supported for user photos and rodape images
 - HTML content stored in editor fields
 - Automatic timestamps on all collections
 
@@ -216,10 +277,11 @@ The database includes seeded data for a "Diário de borda" (Ship's Log) example:
 - Email uniqueness enforced where applicable
 - Required fields enforced at database level
 - File type restrictions on uploads
+- Rodape hash uniqueness per newsletter enforced at database level
 
 ### Migration History:
 - Schema evolved from basic collections to current structure
 - Permission model refined over time
 - Added unique constraints for data integrity
 - Seeded with example content for development
-- Footer data moved from separate collection to embedded fields in textos (simplified schema) 
+- Footer data moved from embedded fields to separate rodapes collection with hash-based deduplication

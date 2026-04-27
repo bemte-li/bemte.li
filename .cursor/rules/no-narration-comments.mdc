@@ -1,0 +1,8 @@
+---
+description: Don't add code comments that narrate fixes or workarounds
+alwaysApply: true
+---
+
+# No Narration Comments
+
+Never add comments explaining *why you moved or changed code* (e.g. `// outside X so Y works`). The code should just be correct. Comments that narrate a fix you made are noise — delete them.
