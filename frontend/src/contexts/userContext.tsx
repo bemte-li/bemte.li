@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { getClientSideInstance } from "@/lib/pocketbase";
+import { createBrowserClient } from "@/lib/pocketbase";
 import type { RecordModel } from "pocketbase";
 
 interface User extends RecordModel {
@@ -35,9 +35,10 @@ export function UserContextProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const pb = getClientSideInstance();
+    const pb = createBrowserClient();
 
-    // Try to refresh auth on mount
+    setUser((pb.authStore.model as User) ?? null);
+
     const refreshAuth = async () => {
       try {
         if (pb.authStore.isValid) {
@@ -53,22 +54,19 @@ export function UserContextProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    // Listen for auth state changes
-    pb.authStore.onChange((token, model) => {
+    pb.authStore.onChange((_token, model) => {
       setUser(model ? (model as User) : null);
     });
 
     refreshAuth();
-
-    // No need to cleanup onChange as it's handled by PocketBase internally
   }, []);
 
   const signIn = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      const pb = getClientSideInstance();
+      const pb = createBrowserClient();
       const authData = await pb.collection("usuarios").authWithPassword(email, password);
       setUser(authData.record as User);
     } catch (err) {
@@ -80,7 +78,7 @@ export function UserContextProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = () => {
-    const pb = getClientSideInstance();
+    const pb = createBrowserClient();
     pb.authStore.clear();
     setUser(null);
   };
@@ -90,9 +88,8 @@ export function UserContextProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      const pb = getClientSideInstance();
+      const pb = createBrowserClient();
       const record = await pb.collection("usuarios").create(userData);
-      // Automatically sign in after account creation
       await signIn(userData.email!, userData.password);
       return record as User;
     } catch (err) {

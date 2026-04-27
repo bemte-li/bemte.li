@@ -123,7 +123,7 @@ The domain model is in Portuguese, both in code and DB. **Use these names verbat
 | `caminho`    | URL slug for a niusleter or texto               |
 | `casa`       | The author's dashboard ("home")                 |
 
-Route paths follow the same convention: `/entrar`, `/solicitar-convite`, `/criar-texto`, `/casa`, `/[niusleter_path]/[text_path]`. Never introduce `/login`, `/signup`, `/dashboard`, etc.
+Route paths follow the same convention: `/entrar`, `/solicitar-convite`, `/criar`, `/casa`, `/[niusleter_path]/[text_path]`. Never introduce `/login`, `/signup`, `/dashboard`, etc.
 
 Full schema details (fields, indexes, permissions) are in `DATABASE_SCHEMA.md` — **read it before touching migrations or queries**.
 

@@ -19,7 +19,7 @@ const links: AdminLink[] = [
     description: 'Visualize um exemplo de texto com conteúdo completo'
   },
   {
-    href: '/criar-texto',
+    href: '/criar',
     title: 'Editor de Texto',
     description: 'Teste a interface de criação e edição de textos'
   },

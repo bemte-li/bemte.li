@@ -61,8 +61,8 @@ This document describes the current database schema for the Bemte.li project, ba
 **Permissions:**
 - `listRule`: "" (public read access)
 - `viewRule`: "" (public read access)
-- `createRule`: null (admin only)
-- `updateRule`: null (admin only)
+- `createRule`: null (admin only — onboarding deliberately curated)
+- `updateRule`: `usuario = @request.auth.id` (the autor can update their own niusleter from `/casa/editar`)
 - `deleteRule`: null (admin only)
 
 **Note:** The unique constraint on `usuario` field enforces a one-to-one relationship between users and newsletters. This can be changed in the future to allow multiple newsletters per user.
@@ -124,9 +124,9 @@ This document describes the current database schema for the Bemte.li project, ba
 **Permissions:**
 - `listRule`: "" (public read access)
 - `viewRule`: "" (public read access)
-- `createRule`: null (admin only)
-- `updateRule`: null (admin only)
-- `deleteRule`: null (admin only)
+- `createRule`: `niusleter.usuario = @request.auth.id` (autor can create textos for their own niusleter)
+- `updateRule`: `niusleter.usuario = @request.auth.id` (autor can edit their own textos)
+- `deleteRule`: `niusleter.usuario = @request.auth.id` (autor can delete their own textos)
 
 **Note:** When creating/updating a texto via the API, you can send `rodape_autor`, `rodape_descricao`, and `rodape_foto` fields. A backend hook will automatically find or create the appropriate rodape record and set the relation.
 
@@ -151,7 +151,11 @@ This document describes the current database schema for the Bemte.li project, ba
 - Unique composite index on (`email`, `niusleter`)
 
 **Permissions:**
-- All rules: null (admin only access)
+- `listRule`: `niusleter.usuario = @request.auth.id` (autor lists only their own inscritos)
+- `viewRule`: `niusleter.usuario = @request.auth.id`
+- `createRule`: null (subscription pipeline is hook-driven)
+- `updateRule`: null (admin only)
+- `deleteRule`: null (admin only)
 
 ---
 
@@ -256,10 +260,14 @@ The database includes seeded data for a "Diário de borda" (Ship's Log) example:
 - **rodapes**: Read-only access to footer content
 - **convites**: Can create new invitation requests
 
+### Autor Access (owner of a niusleter, authenticated via `usuarios`):
+- **niusleteres**: `update` of their own niusleter (`usuario = @request.auth.id`)
+- **textos**: `create`/`update`/`delete` of textos belonging to their niusleter (`niusleter.usuario = @request.auth.id`)
+- **inscritos**: `list`/`view` of inscritos belonging to their niusleter (`niusleter.usuario = @request.auth.id`)
+
 ### Admin Only:
-- **niusleteres**: Newsletter creation/editing
-- **inscritos**: Full subscriber management
-- **textos**: Article creation/editing
+- **niusleteres**: Creation and deletion (onboarding stays curated)
+- **inscritos**: `create`/`update`/`delete` (subscription pipeline is hook-driven)
 - **rodapes**: Managed automatically by backend hooks (immutable)
 - **convites**: Invitation approval/management
 
