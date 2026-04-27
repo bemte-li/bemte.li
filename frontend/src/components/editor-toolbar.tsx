@@ -3,11 +3,16 @@
 import { type Editor } from '@tiptap/react'
 import { useState, useCallback } from 'react'
 
+export type ToolbarVariant = 'full' | 'basic'
+
 interface EditorToolbarProps {
   editor: Editor | null
+  variant?: ToolbarVariant
 }
 
-export default function EditorToolbar({ editor }: EditorToolbarProps) {
+const Separator = () => <span className="w-px bg-sombra/15 mx-0.5 self-stretch" />
+
+export default function EditorToolbar({ editor, variant = 'full' }: EditorToolbarProps) {
   const [linkPopoverOpen, setLinkPopoverOpen] = useState(false)
   const [linkUrl, setLinkUrl] = useState('')
   const [imagePopoverOpen, setImagePopoverOpen] = useState(false)
@@ -51,7 +56,7 @@ export default function EditorToolbar({ editor }: EditorToolbarProps) {
   return (
     <div className="sticky top-0 z-50 bg-marfim border-b border-sombra/10 py-2 px-0 -mx-0">
       <div className="flex flex-nowrap gap-0.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {/* Text style */}
+        {/* Text style — always shown */}
         <button onClick={() => editor.chain().focus().toggleBold().run()} className={cls('bold')} title="Negrito">
           <strong>N</strong>
         </button>
@@ -64,58 +69,67 @@ export default function EditorToolbar({ editor }: EditorToolbarProps) {
         <button onClick={() => editor.chain().focus().toggleStrike().run()} className={cls('strike')} title="Riscado">
           <span className="line-through">R</span>
         </button>
-        <button onClick={() => editor.chain().focus().toggleSuperscript().run()} className={cls('superscript')} title="Sobreescrito">
-          x<sup>2</sup>
-        </button>
 
-        <span className="w-px bg-sombra/15 mx-0.5 self-stretch" />
+        {variant === 'full' && (
+          <button onClick={() => editor.chain().focus().toggleSuperscript().run()} className={cls('superscript')} title="Sobreescrito">
+            x<sup>2</sup>
+          </button>
+        )}
 
-        {/* Headings */}
-        <button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={cls('heading', { level: 1 })} title="Título 1">
-          T1
-        </button>
-        <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={cls('heading', { level: 2 })} title="Título 2">
-          T2
-        </button>
-        <button onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className={cls('heading', { level: 3 })} title="Título 3">
-          T3
-        </button>
+        {variant === 'full' && (
+          <>
+            <Separator />
+            <button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={cls('heading', { level: 1 })} title="Título 1">
+              T1
+            </button>
+            <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={cls('heading', { level: 2 })} title="Título 2">
+              T2
+            </button>
+            <button onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className={cls('heading', { level: 3 })} title="Título 3">
+              T3
+            </button>
+          </>
+        )}
 
-        <span className="w-px bg-sombra/15 mx-0.5 self-stretch" />
+        {variant === 'full' && (
+          <>
+            <Separator />
+            <button onClick={() => editor.chain().focus().toggleBlockquote().run()} className={cls('blockquote')} title="Citação">
+              &ldquo;&rdquo;
+            </button>
+            <button onClick={() => editor.chain().focus().toggleBulletList().run()} className={cls('bulletList')} title="Lista">
+              •
+            </button>
+            <button onClick={() => editor.chain().focus().toggleOrderedList().run()} className={cls('orderedList')} title="Lista numerada">
+              1.
+            </button>
+            <button onClick={() => editor.chain().focus().toggleCode().run()} className={cls('code')} title="Código">
+              {'</>'}
+            </button>
+            <button onClick={() => editor.chain().focus().setHorizontalRule().run()} className={inactive} title="Divisor">
+              —
+            </button>
+          </>
+        )}
 
-        {/* Block elements */}
-        <button onClick={() => editor.chain().focus().toggleBlockquote().run()} className={cls('blockquote')} title="Citação">
-          &ldquo;&rdquo;
-        </button>
-        <button onClick={() => editor.chain().focus().toggleBulletList().run()} className={cls('bulletList')} title="Lista">
-          •
-        </button>
-        <button onClick={() => editor.chain().focus().toggleOrderedList().run()} className={cls('orderedList')} title="Lista numerada">
-          1.
-        </button>
-        <button onClick={() => editor.chain().focus().toggleCode().run()} className={cls('code')} title="Código">
-          {'</>'}
-        </button>
-        <button onClick={() => editor.chain().focus().setHorizontalRule().run()} className={inactive} title="Divisor">
-          —
-        </button>
+        {variant === 'full' && (
+          <>
+            <Separator />
+            <button onClick={() => editor.chain().focus().setTextAlign('left').run()} className={cls('', { textAlign: 'left' })} title="Alinhar esquerda">
+              ←
+            </button>
+            <button onClick={() => editor.chain().focus().setTextAlign('center').run()} className={cls('', { textAlign: 'center' })} title="Centralizar">
+              ↔
+            </button>
+            <button onClick={() => editor.chain().focus().setTextAlign('right').run()} className={cls('', { textAlign: 'right' })} title="Alinhar direita">
+              →
+            </button>
+          </>
+        )}
 
-        <span className="w-px bg-sombra/15 mx-0.5 self-stretch" />
+        <Separator />
 
-        {/* Alignment */}
-        <button onClick={() => editor.chain().focus().setTextAlign('left').run()} className={cls('', { textAlign: 'left' })} title="Alinhar esquerda">
-          ←
-        </button>
-        <button onClick={() => editor.chain().focus().setTextAlign('center').run()} className={cls('', { textAlign: 'center' })} title="Centralizar">
-          ↔
-        </button>
-        <button onClick={() => editor.chain().focus().setTextAlign('right').run()} className={cls('', { textAlign: 'right' })} title="Alinhar direita">
-          →
-        </button>
-
-        <span className="w-px bg-sombra/15 mx-0.5 self-stretch" />
-
-        {/* Link */}
+        {/* Link — always shown */}
         <div className="relative">
           <button
             onClick={() => {
@@ -155,40 +169,42 @@ export default function EditorToolbar({ editor }: EditorToolbarProps) {
           )}
         </div>
 
-        {/* Image */}
-        <div className="relative">
-          <button
-            onClick={() => {
-              setLinkPopoverOpen(false)
-              setImagePopoverOpen((v) => !v)
-            }}
-            className={inactive}
-            title="Imagem"
-          >
-            🖼
-          </button>
-          {imagePopoverOpen && (
-            <div className="absolute top-full left-0 mt-1 z-50 bg-marfim border border-sombra/20 shadow-md p-3 flex flex-col gap-2 min-w-[240px]">
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && insertImage()}
-                placeholder="URL da imagem..."
-                className="border border-sombra/30 px-2 py-1 text-sm bg-marfim text-sombra outline-none focus:border-sombra w-full"
-                autoFocus
-              />
-              <div className="flex gap-2">
-                <button onClick={insertImage} className="bg-citrino text-sombra px-3 py-1 text-xs">
-                  Inserir
-                </button>
-                <button onClick={() => setImagePopoverOpen(false)} className="ml-auto text-sombra/50 hover:text-sombra text-xs px-2">
-                  ✕
-                </button>
+        {/* Image — full only */}
+        {variant === 'full' && (
+          <div className="relative">
+            <button
+              onClick={() => {
+                setLinkPopoverOpen(false)
+                setImagePopoverOpen((v) => !v)
+              }}
+              className={inactive}
+              title="Imagem"
+            >
+              🖼
+            </button>
+            {imagePopoverOpen && (
+              <div className="absolute top-full left-0 mt-1 z-50 bg-marfim border border-sombra/20 shadow-md p-3 flex flex-col gap-2 min-w-[240px]">
+                <input
+                  type="url"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && insertImage()}
+                  placeholder="URL da imagem..."
+                  className="border border-sombra/30 px-2 py-1 text-sm bg-marfim text-sombra outline-none focus:border-sombra w-full"
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <button onClick={insertImage} className="bg-citrino text-sombra px-3 py-1 text-xs">
+                    Inserir
+                  </button>
+                  <button onClick={() => setImagePopoverOpen(false)} className="ml-auto text-sombra/50 hover:text-sombra text-xs px-2">
+                    ✕
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

@@ -1,9 +1,11 @@
 'use client'
 
-import React, { useState, useEffect, memo, KeyboardEvent, useCallback } from 'react'
+import React, { useState, useEffect, memo, KeyboardEvent, useCallback, useRef } from 'react'
 import Link from 'next/link'
+import { type Editor } from '@tiptap/react'
 import { Highlight } from '@/components/Highlight'
 import TextEditor from '@/components/editor'
+import EditorToolbar, { type ToolbarVariant } from '@/components/editor-toolbar'
 import RodapeEditor, { type RodapeData } from '@/components/rodape-editor'
 import ScrollToTop from '@/components/scroll-to-top'
 import { useAutosave, type AutosaveStatus, type DraftData } from '@/hooks/useAutosave'
@@ -125,12 +127,10 @@ const PreviewMode = memo(({ title, content, currentDate, rodape, onEdit }: Previ
       )}
     </div>
     <div className="flex flex-col">
-      <h2 className="text-xl font-mono mb-2">
-        Escrito por
-        <div className="font-bold text-2xl">{rodape.autor || '—'}</div>
-      </h2>
+      <p className="text-sm font-mono mb-1">Escrito por</p>
+      <h2 className="font-bold text-4xl font-mono mb-2">{rodape.autor || '—'}</h2>
       <div
-        className="text-sm"
+        className="text-lg"
         dangerouslySetInnerHTML={{ __html: rodape.descricao }}
       />
     </div>
@@ -147,25 +147,33 @@ interface EditModeProps {
   currentDate: string
   rodape: RodapeData
   autosaveStatus: AutosaveStatus
+  activeEditor: Editor | null
+  toolbarVariant: ToolbarVariant
   onTitleChange: (value: string) => void
   onPreview: () => void
   onEditorUpdate: (html: string) => void
   onRodapeChange: (data: RodapeData) => void
   onSave: () => void
+  onBodyEditorReady: (editor: Editor) => void
+  onBioEditorReady: (editor: Editor) => void
 }
 
-const EditMode = memo(({
+function EditMode({
   title,
   content,
   currentDate,
   rodape,
   autosaveStatus,
+  activeEditor,
+  toolbarVariant,
   onTitleChange,
   onPreview,
   onEditorUpdate,
   onRodapeChange,
   onSave,
-}: EditModeProps) => {
+  onBodyEditorReady,
+  onBioEditorReady,
+}: EditModeProps) {
   const titleRef = React.useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
@@ -186,7 +194,6 @@ const EditMode = memo(({
   return (
     <>
     <div className="prose lg:prose-xl">
-      {/* Top bar */}
       <div className="flex items-center justify-between mb-6 not-prose">
         <Link href="/" className="text-black no-underline">
           <Highlight color="citrino" className="text-4xl">←</Highlight>
@@ -222,17 +229,29 @@ const EditMode = memo(({
         className="mt-0 mb-8 text-sombra outline-none border-b border-sombra/20 focus:border-sombra transition-colors empty:before:content-[attr(data-placeholder)] empty:before:text-gray-500 empty:before:italic"
         data-placeholder="Título do texto"
       />
+    </div>
 
+    <EditorToolbar editor={activeEditor} variant={toolbarVariant} />
+
+    <div className="prose lg:prose-xl">
       <div className="font-serif text-sombra">
-        <TextEditor onUpdate={onEditorUpdate} initialContent={content} />
+        <TextEditor
+          onUpdate={onEditorUpdate}
+          initialContent={content}
+          showToolbar={false}
+          onEditorReady={onBodyEditorReady}
+        />
       </div>
     </div>
 
-    <RodapeEditor value={rodape} onChange={onRodapeChange} />
+    <RodapeEditor
+      value={rodape}
+      onChange={onRodapeChange}
+      onBioEditorReady={onBioEditorReady}
+    />
     </>
   )
-})
-EditMode.displayName = 'EditMode'
+}
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
@@ -245,6 +264,32 @@ export default function CriarTexto() {
   const [rodape, setRodape] = useState<RodapeData>(EMPTY_RODAPE)
   const [pendingDraft, setPendingDraft] = useState<DraftData | null>(null)
   const [draftBannerVisible, setDraftBannerVisible] = useState(false)
+
+  const [activeEditor, setActiveEditor] = useState<Editor | null>(null)
+  const [toolbarVariant, setToolbarVariant] = useState<ToolbarVariant>('full')
+
+  const bodyEditorRef = useRef<Editor | null>(null)
+  const bioEditorRef = useRef<Editor | null>(null)
+
+  const handleBodyEditorReady = useCallback((editor: Editor) => {
+    bodyEditorRef.current = editor
+    setActiveEditor(editor)
+    setToolbarVariant('full')
+
+    editor.on('focus', () => {
+      setActiveEditor(editor)
+      setToolbarVariant('full')
+    })
+  }, [])
+
+  const handleBioEditorReady = useCallback((editor: Editor) => {
+    bioEditorRef.current = editor
+
+    editor.on('focus', () => {
+      setActiveEditor(editor)
+      setToolbarVariant('basic')
+    })
+  }, [])
 
   const [currentDate, setCurrentDate] = useState('')
   useEffect(() => {
@@ -267,7 +312,6 @@ export default function CriarTexto() {
 
   const { status, saveNow, loadDraft, clearDraft } = useAutosave(draftData)
 
-  // Check for existing draft on first render
   useEffect(() => {
     const draft = loadDraft()
     if (draft && (draft.title || draft.content || draft.rodape.autor)) {
@@ -323,11 +367,15 @@ export default function CriarTexto() {
           currentDate={currentDate}
           rodape={rodape}
           autosaveStatus={status}
+          activeEditor={activeEditor}
+          toolbarVariant={toolbarVariant}
           onTitleChange={setTitle}
           onPreview={() => setIsPreview(true)}
           onEditorUpdate={setContent}
           onRodapeChange={setRodape}
           onSave={handleSave}
+          onBodyEditorReady={handleBodyEditorReady}
+          onBioEditorReady={handleBioEditorReady}
         />
       )}
 

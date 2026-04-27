@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Highlight } from '@/components/Highlight'
-import { AuthorBio } from '@/components/AuthorBio'
+import { RodapeDisplay } from '@/components/rodape-display'
 import { getTextoByPath, getNiusleterByPath, getPocketBaseFileUrl } from '@/lib/pocketbase'
 import type { Texto, Niusleter } from '@/lib/types'
 import { Navbar } from '@/components/Navbar'
@@ -65,7 +65,7 @@ export default async function TextoPage({ params }: PageProps) {
 
           <div className="mt-16">
             {texto.expand?.rodape?.autor && (
-              <AuthorBio
+              <RodapeDisplay
                 name={texto.expand.rodape.autor}
                 bio={texto.expand.rodape.descricao || ''}
                 imageUrl={

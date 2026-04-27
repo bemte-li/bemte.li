@@ -1,6 +1,6 @@
 'use client'
 
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
 import Underline from '@tiptap/extension-underline'
@@ -13,9 +13,16 @@ import EditorToolbar from './editor-toolbar'
 interface TextEditorProps {
   onUpdate?: (html: string) => void
   initialContent?: string
+  showToolbar?: boolean
+  onEditorReady?: (editor: Editor) => void
 }
 
-export default function TextEditor({ onUpdate, initialContent = '' }: TextEditorProps) {
+export default function TextEditor({
+  onUpdate,
+  initialContent = '',
+  showToolbar = true,
+  onEditorReady,
+}: TextEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -49,6 +56,12 @@ export default function TextEditor({ onUpdate, initialContent = '' }: TextEditor
   })
 
   useEffect(() => {
+    if (editor) {
+      onEditorReady?.(editor)
+    }
+  }, [editor, onEditorReady])
+
+  useEffect(() => {
     if (editor && initialContent !== editor.getHTML()) {
       editor.commands.setContent(initialContent)
     }
@@ -56,7 +69,7 @@ export default function TextEditor({ onUpdate, initialContent = '' }: TextEditor
 
   return (
     <div>
-      <EditorToolbar editor={editor} />
+      {showToolbar && <EditorToolbar editor={editor} />}
       <EditorContent editor={editor} />
     </div>
   )

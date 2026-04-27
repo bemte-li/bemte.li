@@ -1,7 +1,19 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useEditor, EditorContent, type Editor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
+import Link from '@tiptap/extension-link'
 import { getClientSideInstance, getPocketBaseFileUrl } from '@/lib/pocketbase'
+
+function PhotoIcon({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Zm6-13.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+    </svg>
+  )
+}
 
 export interface RodapeData {
   autor: string
@@ -13,15 +25,57 @@ export interface RodapeData {
 interface RodapeEditorProps {
   value: RodapeData
   onChange: (data: RodapeData) => void
+  onBioEditorReady?: (editor: Editor) => void
 }
 
-export default function RodapeEditor({ value, onChange }: RodapeEditorProps) {
+export default function RodapeEditor({ value, onChange, onBioEditorReady }: RodapeEditorProps) {
   const [loading, setLoading] = useState(true)
   const [loaded, setLoaded] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const descRef = useRef<HTMLDivElement>(null)
 
-  // Fetch rodapé from PocketBase on mount (only once)
+  const bioEditor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: false,
+        blockquote: false,
+        codeBlock: false,
+        code: false,
+        horizontalRule: false,
+        bulletList: false,
+        orderedList: false,
+      }),
+      Underline,
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-bordo underline cursor-pointer',
+        },
+      }),
+    ],
+    content: value.descricao,
+    editorProps: {
+      attributes: {
+        class: 'text-lg text-sombra outline-none focus:outline-none min-h-[2em] prose prose-lg max-w-none',
+      },
+    },
+    onUpdate: ({ editor }) => {
+      onChange({ ...value, descricao: editor.getHTML() })
+    },
+    immediatelyRender: false,
+  })
+
+  useEffect(() => {
+    if (bioEditor) {
+      onBioEditorReady?.(bioEditor)
+    }
+  }, [bioEditor, onBioEditorReady])
+
+  useEffect(() => {
+    if (bioEditor && value.descricao !== bioEditor.getHTML()) {
+      bioEditor.commands.setContent(value.descricao)
+    }
+  }, [bioEditor, value.descricao])
+
   useEffect(() => {
     if (loaded) return
     const pb = getClientSideInstance()
@@ -65,13 +119,6 @@ export default function RodapeEditor({ value, onChange }: RodapeEditorProps) {
     fetchRodape()
   }, [loaded, onChange])
 
-  // Sync descricao contentEditable on external value changes
-  useEffect(() => {
-    if (descRef.current && descRef.current.innerHTML !== value.descricao) {
-      descRef.current.innerHTML = value.descricao
-    }
-  }, [value.descricao])
-
   const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -103,14 +150,12 @@ export default function RodapeEditor({ value, onChange }: RodapeEditorProps) {
                 {loading ? (
                   <span className="text-xs text-sombra/40 animate-pulse">…</span>
                 ) : (
-                  <span className="text-2xl text-sombra/30">+</span>
+                  <PhotoIcon className="w-10 h-10 text-sombra/30" />
                 )}
               </div>
             )}
             <div className="absolute inset-0 bg-sombra/0 group-hover/foto:bg-sombra/20 transition-colors flex items-center justify-center">
-              <span className="opacity-0 group-hover/foto:opacity-100 text-marfim text-xs font-mono transition-opacity">
-                ✎
-              </span>
+              <PhotoIcon className="w-8 h-8 opacity-0 group-hover/foto:opacity-100 text-marfim transition-opacity" />
             </div>
           </div>
           <input
@@ -124,7 +169,7 @@ export default function RodapeEditor({ value, onChange }: RodapeEditorProps) {
 
         {/* Text fields */}
         <div className="flex flex-col min-w-0 flex-1">
-          <p className="text-xl font-mono mb-2">
+          <p className="text-sm font-mono mb-1">
             Escrito por
           </p>
           <input
@@ -132,21 +177,12 @@ export default function RodapeEditor({ value, onChange }: RodapeEditorProps) {
             value={value.autor}
             onChange={(e) => onChange({ ...value, autor: e.target.value })}
             placeholder="Nome do autor"
-            className="font-bold text-2xl font-mono bg-transparent outline-none border-b border-transparent hover:border-sombra/20 focus:border-sombra transition-colors mb-2 text-sombra"
+            className="font-bold text-4xl font-mono bg-transparent outline-none border-b border-transparent hover:border-sombra/20 focus:border-sombra transition-colors mb-2 text-sombra"
           />
           {loading ? (
             <div className="h-4 bg-sombra/10 rounded animate-pulse w-3/4" />
           ) : (
-            <div
-              ref={descRef}
-              contentEditable
-              suppressContentEditableWarning
-              onInput={(e) =>
-                onChange({ ...value, descricao: e.currentTarget.innerHTML })
-              }
-              className="text-sm text-sombra outline-none border-b border-transparent hover:border-sombra/20 focus:border-sombra transition-colors empty:before:content-[attr(data-placeholder)] empty:before:text-sombra/40"
-              data-placeholder="Descrição / bio do autor"
-            />
+            <EditorContent editor={bioEditor} />
           )}
         </div>
       </div>
