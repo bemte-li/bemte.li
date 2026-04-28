@@ -1,15 +1,14 @@
-import Image from 'next/image'
 import Link from 'next/link'
+import { PublicShell } from '@/components/article-layout'
 import { Highlight } from '@/components/Highlight'
 import { RodapeDisplay } from '@/components/rodape-display'
-import { getTextoByPath, getNiusleterByPath, getPocketBaseFileUrl } from '@/lib/pocketbase'
-import type { Texto, Niusleter } from '@/lib/types'
-import { Navbar } from '@/components/Navbar'
+import { getNiusleterByPath, getPocketBaseFileUrl, getTextoByPath } from '@/lib/pocketbase'
+import type { Niusleter, Texto } from '@/lib/types'
 
 interface PageProps {
   params: Promise<{
-    niusleter_path: string;
-    text_path: string;
+    niusleter_path: string
+    text_path: string
   }>
 }
 
@@ -20,64 +19,80 @@ export default async function TextoPage({ params }: PageProps) {
   let error: string | null = null
 
   try {
-    // Get the texto by its path
     texto = await getTextoByPath(text_path)
-    
-    // Get the niusleter by its path for additional context
     niusleter = await getNiusleterByPath(niusleter_path)
-    
-    // Verify that the texto belongs to the niusleter
+
     if (texto && niusleter && texto.niusleter !== niusleter.id) {
       error = 'Texto não encontrado nesta niusleter.'
     }
-  } catch (e) {
+  } catch {
     error = 'Erro ao carregar texto do PocketBase.'
   }
 
   if (error) {
-    return <div className="text-red-600 text-center py-8">{error}</div>
+    return (
+      <PublicShell>
+        <div className="text-red-600 text-center py-8">{error}</div>
+      </PublicShell>
+    )
   }
 
   if (!texto || !niusleter) {
-    return <div className="text-center py-8">Carregando...</div>
+    return (
+      <PublicShell>
+        <div className="text-center py-8">Carregando...</div>
+      </PublicShell>
+    )
   }
 
+  const niusleterRecord = texto.expand?.niusleter || niusleter
+
   return (
-    <>
-      <Navbar niusleter={texto.expand?.niusleter || niusleter} isLoggedIn={false} />
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <article className="prose lg:prose-xl">
-          <div className="flex items-center mb-6">
-            <Link href={`/${niusleter_path}`} className="text-black no-underline">
-              <Highlight color="citrino" className="text-4xl">←</Highlight>
-            </Link>
-          </div>
+    <PublicShell niusleter={niusleterRecord}>
+      <article className="prose lg:prose-xl">
+        <div className="flex items-center mb-6">
+          <Link href={`/${niusleter_path}`} className="text-black no-underline">
+            <Highlight color="citrino" className="text-4xl">←</Highlight>
+          </Link>
+        </div>
 
-          <div className="text-sm text-gray-600 mb-4 font-mono">
-            {texto.enviado ? new Date(texto.enviado).toLocaleString('pt-BR', { day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''}
-          </div>
+        <div className="text-sm text-gray-600 mb-4 font-mono">
+          {texto.enviado
+            ? new Date(texto.enviado).toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: 'short',
+                year: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+            : ''}
+        </div>
 
-          <h1 className="mt-0 mb-8 text-sombra">
-            {texto.titulo}
-          </h1>
+        <h1 className="mt-0 mb-8 text-sombra">{texto.titulo}</h1>
 
-          <div className="font-serif text-sombra" dangerouslySetInnerHTML={{ __html: texto.corpo || '' }} />
+        <div
+          className="font-serif text-sombra"
+          dangerouslySetInnerHTML={{ __html: texto.corpo || '' }}
+        />
 
-          <div className="mt-16">
-            {texto.expand?.rodape?.autor && (
-              <RodapeDisplay
-                name={texto.expand.rodape.autor}
-                bio={texto.expand.rodape.descricao || ''}
-                imageUrl={
-                  texto.expand.rodape.foto
-                    ? getPocketBaseFileUrl('rodapes', texto.expand.rodape.id, texto.expand.rodape.foto)
-                    : '/Logo-Vertical.svg'
-                }
-              />
-            )}
-          </div>
-        </article>
-      </div>
-    </>
+        <div className="mt-16">
+          {texto.expand?.rodape?.autor && (
+            <RodapeDisplay
+              name={texto.expand.rodape.autor}
+              bio={texto.expand.rodape.descricao || ''}
+              imageUrl={
+                texto.expand.rodape.foto
+                  ? getPocketBaseFileUrl(
+                      'rodapes',
+                      texto.expand.rodape.id,
+                      texto.expand.rodape.foto,
+                    )
+                  : '/Logo-Vertical.svg'
+              }
+            />
+          )}
+        </div>
+      </article>
+    </PublicShell>
   )
-} 
+}
