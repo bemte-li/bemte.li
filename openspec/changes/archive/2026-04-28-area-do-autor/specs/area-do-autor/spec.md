@@ -38,13 +38,14 @@ The system SHALL render a `/casa` page that:
 - **AND** the system does not crash or render a partial/broken dashboard
 
 ### Requirement: `/casa/editar` lets the autor edit their niusleter
-The system SHALL provide a `/casa/editar` page that loads the niusleter where `usuario = @request.auth.id` and lets the autor edit `nome`, `descricao` (HTML editor), `foto` (file upload), and `caminho`.
+The system SHALL provide a `/casa/editar` page that loads the niusleter where `usuario = @request.auth.id` and lets the autor edit `nome`, `descricao` (HTML editor), `display_mode`, `foto_3x4` (file upload), `foto_horizontal` (file upload), and `caminho`.
 
 The form SHALL:
 - Validate `caminho` against the pattern `^[a-z0-9-]+$` client-side (and rely on PocketBase server-side validation as the authoritative check).
 - Show a permanent warning next to the `caminho` field stating that changing it will break existing public URLs.
 - Show a confirmation modal on submit when `caminho` changed from its loaded value, asking the autor to confirm before saving.
 - Persist via `pb.collection("niusleteres").update(id, ...)` against the rule `usuario = @request.auth.id`.
+- Expose a control to clear an existing photo (set the file field to empty) without uploading a replacement.
 
 #### Scenario: Edit name and description without changing the slug
 - **WHEN** the autor changes only `nome` and `descricao` and clicks "Salvar"
@@ -61,8 +62,16 @@ The form SHALL:
 - **THEN** the form blocks submission and shows an inline Portuguese error explaining the allowed characters
 
 #### Scenario: Replacing the niusleter photo
-- **WHEN** the autor selects a new image file for `foto` and saves
+- **WHEN** the autor selects a new image file for `foto_3x4` (or `foto_horizontal`) and saves
 - **THEN** the system uploads the file to the `niusleteres` collection and the saved record references the new file name
+
+#### Scenario: Switching display mode
+- **WHEN** the autor changes `display_mode` (e.g. `title_only` → `title_with_3x4_photo` → `title_image_horizontal`) and saves
+- **THEN** the system persists the new mode and the public navbar reflects the choice (title only, title with round 3x4 avatar, or horizontal image)
+
+#### Scenario: Clearing a niusleter photo
+- **WHEN** the autor clicks "Remover foto" for `foto_3x4` or `foto_horizontal` and saves
+- **THEN** the system submits an empty value for that field, PocketBase deletes the file, and subsequent reads return no photo
 
 ### Requirement: `/casa/textos` lists the autor's textos read-only
 The system SHALL provide a `/casa/textos` page that lists every `textos` row whose `niusleter.usuario = @request.auth.id`, showing for each: `titulo`, `caminho`, `enviado` date, and `created` date, sorted by `-created`.

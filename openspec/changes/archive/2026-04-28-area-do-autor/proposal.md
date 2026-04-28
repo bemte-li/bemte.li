@@ -8,7 +8,7 @@ Bemte.li does not have a way for an autor to log in and manage their own niuslet
   - On success, redirects to `/casa`.
   - Already-logged-in users hitting `/entrar` are redirected to `/casa`.
 - New `/casa` dashboard with links to the sub-pages below and a logout action.
-- New `/casa/editar` page to edit the autor's niusleter (`nome`, `descricao`, `foto`, `caminho`). Editing `caminho` shows a clear warning that public URLs to existing textos will break.
+- New `/casa/editar` page to edit the autor's niusleter (`nome`, `descricao`, `display_mode`, `foto_3x4`, `foto_horizontal`, `caminho`). Editing `caminho` shows a clear warning that public URLs to existing textos will break.
 - New `/casa/inscritos` read-only listing of the autor's inscritos.
 - New `/casa/textos` read-only listing of the autor's textos.
 - **BREAKING:** rename route `/criar-texto` → `/criar`. The `/criar-texto` URL goes away (the existing editor UI moves as-is). Internal links updated.

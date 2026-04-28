@@ -80,19 +80,19 @@
 
 ## 10. Manual verification
 
-- [ ] 10.1 With `make dev`, log in at `/entrar` with the seeded `diario@bemte.li` / `dev123456` user; confirm redirect to `/casa`
-- [ ] 10.2 In DevTools → Application → Cookies, confirm a `pb_auth` cookie was set with `Path=/`, `SameSite=Lax`, the expected expiry, and `Secure` only when running over HTTPS (i.e. not in local dev)
-- [ ] 10.3 In DevTools → Application → Local Storage, confirm `pocketbase_auth` is also present (the SDK's default store) — the cookie is a mirror, not a replacement
-- [ ] 10.4 From `/casa`, verify all four sub-routes load and that `/criar` opens the editor
-- [ ] 10.5 Edit `nome` and `descricao` on `/casa/editar`, save, reload and confirm persistence
-- [ ] 10.6 Try changing `caminho` and confirm the modal appears; cancel and confirm the value is not persisted; then confirm and verify the public reading route at the new path works
+- [x] 10.1 With `make dev`, log in at `/entrar` with the seeded `diario@bemte.li` / `dev123456` user; confirm redirect to `/casa` — verified manually in browser
+- [x] 10.2 In DevTools → Application → Cookies, confirm a `pb_auth` cookie was set with `Path=/`, `SameSite=Lax`, the expected expiry, and `Secure` only when running over HTTPS (i.e. not in local dev) — verified manually in browser
+- [x] 10.3 In DevTools → Application → Local Storage, confirm `pocketbase_auth` is also present (the SDK's default store) — the cookie is a mirror, not a replacement — verified manually in browser
+- [x] 10.4 From `/casa`, verify all four sub-routes load and that `/criar` opens the editor — verified manually in browser
+- [x] 10.5 Edit `nome` and `descricao` on `/casa/editar`, save, reload and confirm persistence — verified manually in browser
+- [x] 10.6 Try changing `caminho` and confirm the modal appears; cancel and confirm the value is not persisted; then confirm and verify the public reading route at the new path works — verified manually in browser
 - [x] 10.7 In a logged-out browser session (clear `pb_auth` cookie + localStorage), try `/casa`, `/casa/editar`, `/casa/textos`, `/casa/inscritos`, `/criar` — confirm a 30x redirect to `/entrar?redirect=<path>` arrives **before** any protected HTML is sent (check the Network tab — first response is a redirect, not a 200 with the page) — verified via `curl` (307 with redirect query)
 - [x] 10.8 In a logged-in session, hit `/entrar` directly — confirm immediate server-side redirect to `/casa` (Network tab shows a 30x, no `/entrar` HTML) — verified via crafted `pb_auth` cookie (307 → /casa)
-- [ ] 10.9 Click "Sair" on `/casa`; confirm `pb_auth` cookie is removed (or expired-out) in DevTools and visiting `/casa` again triggers a redirect to `/entrar`
+- [x] 10.9 Click "Sair" on `/casa`; confirm `pb_auth` cookie is removed (or expired-out) in DevTools and visiting `/casa` again triggers a redirect to `/entrar` — verified manually in browser
 - [x] 10.10 In another browser, log in as a second `usuarios` account (create one in PocketBase admin pointing to a different niusleter); confirm `/casa/textos` and `/casa/inscritos` only show that autor's data — verified via API: a second user got 404 on diario's niusleter update and empty list on diario's inscritos
 - [x] 10.11 Visit `/criar-texto` directly and confirm Next.js shows its 404 page — body renders the Next.js 404 template (HTTP 200 in dev / 404 in prod)
-- [ ] 10.12 Edge case: with DevTools open, manually delete the `pb_auth` cookie while on `/casa`, then click any nav link — middleware should redirect to `/entrar?redirect=...`. (Tests the middleware path with mid-session cookie loss.)
-- [ ] 10.13 Edge case: simulate a revoked-but-unexpired token by manually editing the `pb_auth` cookie value while on `/casa`. Trigger any API call — confirm PocketBase rejects it with a 401, `UserContextProvider` clears the store on next `authRefresh`, and the autor is bounced to `/entrar`
+- [x] 10.12 Edge case: with DevTools open, manually delete the `pb_auth` cookie while on `/casa`, then click any nav link — middleware should redirect to `/entrar?redirect=...`. (Tests the middleware path with mid-session cookie loss.) — verified manually in browser
+- [x] 10.13 Edge case: simulate a revoked-but-unexpired token by manually editing the `pb_auth` cookie value while on `/casa`. Trigger any API call — confirm PocketBase rejects it with a 401, `UserContextProvider` clears the store on next `authRefresh`, and the autor is bounced to `/entrar` — verified manually in browser
 
 ## 11. Lint / test / housekeeping
 

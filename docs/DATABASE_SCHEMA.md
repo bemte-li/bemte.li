@@ -40,10 +40,17 @@ This document describes the current database schema for the Bemte.li project, ba
 - `id` (text, primary key) - Auto-generated 15-character alphanumeric ID
 - `nome` (text) - Newsletter name (max 255 chars)
 - `descricao` (editor) - Newsletter description/bio (HTML content)
-- `foto` (file) - Newsletter logo/image
+- `foto_3x4` (file) - Square avatar shown when `display_mode = title_with_3x4_photo`
   - Accepted types: JPEG, PNG, SVG, GIF, WebP
   - Max select: 1 file
-  - Thumbnails: 400x400px
+  - Thumbnails: 400x400
+- `display_mode` (select, required) - How the niusleter title renders in the public navbar
+  - Values: `title_only` | `title_with_3x4_photo` | `title_image_horizontal`
+  - Max select: 1
+- `foto_horizontal` (file) - Wide image shown when `display_mode = title_image_horizontal`
+  - Accepted types: JPEG, PNG, SVG, GIF, WebP
+  - Max select: 1 file
+  - Thumbnails: 1200x400
 - `caminho` (text, required) - URL path/slug for the newsletter
   - Pattern: `^[a-z0-9-]+$` (lowercase letters, numbers, hyphens only)
   - Max 255 chars
@@ -66,6 +73,8 @@ This document describes the current database schema for the Bemte.li project, ba
 - `deleteRule`: null (admin only)
 
 **Note:** The unique constraint on `usuario` field enforces a one-to-one relationship between users and newsletters. This can be changed in the future to allow multiple newsletters per user.
+
+**Note on photo fields:** `foto_3x4` and `foto_horizontal` are independent files. The autor picks which one to display via `display_mode`. The `/casa/editar` form lets the autor upload, replace, or clear each one independently.
 
 ---
 

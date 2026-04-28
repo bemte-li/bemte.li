@@ -141,6 +141,16 @@ We allow it (per the user's choice) but the `/casa/editar` form **MUST**:
 
 We do **not** introduce server-side redirects from old `caminho` to new `caminho`. Out of scope.
 
+### 5b. Niusleter photo + display fields
+
+The current `niusleteres` schema (introduced in `1751400000_major_schema_refactor`) already carries three presentation fields:
+
+- `foto_3x4` — square avatar used when `display_mode = title_with_3x4_photo`.
+- `foto_horizontal` — wide image used when `display_mode = title_image_horizontal`.
+- `display_mode` — single-select among `title_only | title_with_3x4_photo | title_image_horizontal`, controlling how the public navbar renders the niusleter title.
+
+The `/casa/editar` form exposes all three so the autor can pick how the niusleter shows up publicly without going through the PocketBase admin. Each photo field has a "Remover foto" control that submits an empty value (PocketBase deletes the underlying file), independently of the other field.
+
 ### 6. PocketBase permission rules
 
 For `niusleteres`:

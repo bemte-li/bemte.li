@@ -54,11 +54,15 @@ export function UserContextProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    pb.authStore.onChange((_token, model) => {
+    const unsubscribe = pb.authStore.onChange((_token, model) => {
       setUser(model ? (model as User) : null);
     });
 
     refreshAuth();
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {

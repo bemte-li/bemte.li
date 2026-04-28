@@ -5,7 +5,7 @@ import { useEditor, EditorContent, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
-import { getClientSideInstance, getPocketBaseFileUrl } from '@/lib/pocketbase'
+import { createBrowserClient, getPocketBaseFileUrl } from '@/lib/pocketbase'
 
 function PhotoIcon({ className }: { className?: string }) {
   return (
@@ -78,7 +78,7 @@ export default function RodapeEditor({ value, onChange, onBioEditorReady }: Roda
 
   useEffect(() => {
     if (loaded) return
-    const pb = getClientSideInstance()
+    const pb = createBrowserClient()
 
     async function fetchRodape() {
       try {
