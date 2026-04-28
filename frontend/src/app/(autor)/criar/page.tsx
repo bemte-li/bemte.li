@@ -1,10 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, memo, KeyboardEvent, useCallback, useRef } from 'react'
-import Link from 'next/link'
 import { type Editor } from '@tiptap/react'
-import { Highlight } from '@/components/Highlight'
-import TextEditor from '@/components/editor'
+import TextEditor, { EditorVoltarButton } from '@/components/editor'
 import EditorToolbar, { type ToolbarVariant } from '@/components/editor-toolbar'
 import RodapeEditor, { type RodapeData } from '@/components/rodape-editor'
 import ScrollToTop from '@/components/scroll-to-top'
@@ -95,9 +93,7 @@ const PreviewMode = memo(({ title, content, currentDate, rodape, onEdit }: Previ
   <>
   <article className="prose lg:prose-xl">
     <div className="flex items-center justify-between mb-6">
-      <Link href="/" className="text-black no-underline">
-        <Highlight color="citrino" className="text-4xl">←</Highlight>
-      </Link>
+      <EditorVoltarButton />
       <button
         onClick={onEdit}
         className="bg-citrino px-6 py-2 text-sm hover:bg-citrino/90 transition-colors text-sombra"
@@ -195,9 +191,7 @@ function EditMode({
     <>
     <div className="prose lg:prose-xl">
       <div className="flex items-center justify-between mb-6 not-prose">
-        <Link href="/" className="text-black no-underline">
-          <Highlight color="citrino" className="text-4xl">←</Highlight>
-        </Link>
+        <EditorVoltarButton />
 
         <div className="flex items-center gap-3">
           <AutosaveIndicator status={autosaveStatus} />

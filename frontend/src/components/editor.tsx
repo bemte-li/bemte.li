@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useEditor, EditorContent, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
@@ -8,7 +9,31 @@ import Superscript from '@tiptap/extension-superscript'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import { useEffect } from 'react'
+import { Highlight } from './Highlight'
 import EditorToolbar from './editor-toolbar'
+
+export function EditorVoltarButton() {
+  const router = useRouter()
+  const handleVoltar = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back()
+      return
+    }
+    router.push('/casa')
+  }
+  return (
+    <button
+      type="button"
+      onClick={handleVoltar}
+      className="text-black bg-transparent border-0 p-0 cursor-pointer font-inherit"
+      aria-label="Voltar"
+    >
+      <Highlight color="citrino" className="text-4xl">
+        ←
+      </Highlight>
+    </button>
+  )
+}
 
 interface TextEditorProps {
   onUpdate?: (html: string) => void
